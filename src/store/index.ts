@@ -1,1 +1,1 @@
-export { CanvasItemsProvider as CanvasItems } from './CanvasItems'
+export { CanvasItemsProvider as CanvasItems } from './CanvasItems';

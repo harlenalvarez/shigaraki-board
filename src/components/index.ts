@@ -1,4 +1,4 @@
-export { Container } from './container'
+export { Container } from './container';
 
-export * from './SectionsRender'
-export * from './CanvasActions'
+export * from './SectionsRender';
+export * from './CanvasActions';
