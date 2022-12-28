@@ -1,0 +1,41 @@
+:root {
+    --bg-color: rgb(244, 241, 247);
+    --dot-color: rgb(109, 109, 111);
+    --text-color: rgb(38, 37, 37);
+}
+
+
+
+.main {
+    color: var(--text-color);
+    z-index: 1;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
+    min-width: 100vh;
+}
+
+.popover {
+    position: absolute;
+    color: var(--text-color);
+    z-index: 2;
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
+    min-width: 100vh;
+}
+
+.canvas {
+    z-index: 0;
+    position: absolute;
+    color: var(--text-color);
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
+    min-width: 100vh;
+    background: var(--bg-color);
+    background-image: radial-gradient(var(--dot-color) 5%, transparent 0);
+    background-size: 2% 2%;
+    background-position: -1% -1%;
+}
