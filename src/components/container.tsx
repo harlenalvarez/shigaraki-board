@@ -1,3 +1,4 @@
+import { Canvas } from './Canvas';
 import styles from './Container.module.css';
 import { Main } from './Main';
 
@@ -11,8 +12,8 @@ export const Container = () => {
       <section id='popover' className={styles.popover} tabIndex={1}>
 
       </section>
-      <section id='canvas' className={styles.canvas}>
-
+      <section id='canvas' className={styles.canvas} tabIndex={0}>
+        <Canvas />
       </section>
     </>
   );

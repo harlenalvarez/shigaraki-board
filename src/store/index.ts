@@ -1,1 +1,1 @@
-export { CanvasItemsProvider as CanvasItems } from './CanvasItems';
+export { CanvasCtxProvider, useCanvasCtx, useSetCanvasCtx } from './CanvasContext/CanvasCtxProvider';
