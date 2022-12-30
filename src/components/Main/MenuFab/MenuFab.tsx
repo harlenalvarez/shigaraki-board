@@ -1,8 +1,8 @@
 import Divider from '@mui/material/Divider';
 import { useLayoutEffect, useRef, useState } from 'react';
-import { Stack } from './CanvasActions.styled';
+import { Stack } from './MenuFab.styled';
 
-export const CanvasActions = () => {
+export const MenuFab = () => {
   const stackRef = useRef<HTMLDivElement>(null);
   const [currentHeight, setCurrentHeight] = useState('');
 
@@ -13,7 +13,7 @@ export const CanvasActions = () => {
   }, []);
 
   return (
-      <Stack ref={stackRef} currentHeight={currentHeight} direction='column' divider={<Divider orientation="vertical" flexItem />}>
+      <Stack ref={stackRef} currentheight={currentHeight} direction='column' divider={<Divider orientation="vertical" flexItem />}>
         <div style={{ height: '80vh' }}>Button</div>
       </Stack>
   );

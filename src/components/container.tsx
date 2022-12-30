@@ -9,9 +9,7 @@ export const Container = () => {
       <section id='main' className={styles.main} tabIndex={1}>
         <Main />
       </section>
-      <section id='popover' className={styles.popover} tabIndex={1}>
-
-      </section>
+      <section id='popover' className={styles.popover} tabIndex={1} />
       <section id='canvas' className={styles.canvas} tabIndex={0}>
         <Canvas />
       </section>

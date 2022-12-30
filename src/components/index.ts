@@ -1,4 +1,4 @@
 export { Container } from './Container';
 
 export * from './SectionsRender';
-export * from './CanvasActions';
+export * from './Main/MenuFab';
