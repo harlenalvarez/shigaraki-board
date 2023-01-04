@@ -1,3 +1,9 @@
+:root {
+    --bg-color: #f4f1f7;
+    --dot-color: #6d6d6f;
+    --text-color: #262525;
+}
+
 body {
     margin: 0;
 }

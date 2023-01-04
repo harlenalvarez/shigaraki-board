@@ -13,6 +13,7 @@ export const Container = () => {
       <section id='canvas' className={styles.canvas} tabIndex={0}>
         <Canvas />
       </section>
+      <section id='hidden-canvas' className={styles.hidden} tabIndex={0} aria-hidden='true'></section>
     </>
   );
 };

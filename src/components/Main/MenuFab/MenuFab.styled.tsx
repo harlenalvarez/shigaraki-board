@@ -11,4 +11,5 @@ export const Stack = styled(MuiStack)<StackProps>`
   left: 10px;
   background-color: red;
   border-radius: 4px;
+  z-index: 1;
 `;

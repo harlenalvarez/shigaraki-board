@@ -1,37 +1,31 @@
-:root {
-    --bg-color: #f4f1f7;
-    --dot-color: #6d6d6f;
-    --text-color: #262525;
-}
-
-
-
 .main {
-    color: var(--text-color);
-    z-index: 1;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    min-height: 100vh;
-    min-width: 100vh;
+	color: var(--text-color);
+	z-index: 1;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	min-height: 100vh;
+	min-width: 100vh;
 }
 
 .popover {
-    position: absolute;
-    color: var(--text-color);
-    z-index: 2;
+	position: absolute;
+	color: var(--text-color);
+	z-index: 2;
 }
 
 .canvas {
-    z-index: 0;
-    position: absolute;
-    color: var(--text-color);
-    height: 100%;
-    width: 100%;
-    min-height: 100vh;
-    min-width: 100vh;
-    background: var(--bg-color);
-    background-image: radial-gradient(var(--dot-color) 5%, transparent 0);
-    background-size: 2% 2%;
-    background-position: -1% -1%;
+	z-index: 0;
+	position: absolute;
+	color: var(--text-color);
+	min-height: 100vh;
+	min-width: 100vh;
+	background: var(--bg-color);
+	background-image: radial-gradient(var(--dot-color) 5%, transparent 0);
+	background-size: 2% 2%;
+	background-position: -1% -1%;
+}
+
+.hidden {
+	display: none;
 }
