@@ -18,8 +18,8 @@ export const MenuFab = () => {
   }, []);
 
   return (
-      <Stack ref={stackRef} currentheight={currentHeight} direction='column' divider={<Divider orientation="vertical" flexItem />}>
-        <div style={{ height: '80vh' }}>Button</div>
-      </Stack>
+    <Stack ref={stackRef} currentheight={currentHeight} direction='column' divider={<Divider orientation="vertical" flexItem />}>
+      <div style={{ height: '80vh' }}>Button</div>
+    </Stack>
   );
 };
