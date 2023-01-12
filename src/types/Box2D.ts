@@ -1,3 +1,4 @@
+import { RenderedObjects } from '@/store';
 import { Need } from './reducer';
 import { ShapesBase } from './ShapesBase';
 
@@ -7,7 +8,7 @@ export class Box2D extends ShapesBase {
   height: number;
   radius: number;
   path: Path2D;
-  boxes: RenderedObjects
+  boxes: RenderedObjects<Box2D> = new RenderedObjects()
   constructor(props: Need<Box2D, 'width' | 'height' | 'point'>) {
     super(props)
 

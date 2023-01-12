@@ -38,7 +38,7 @@ class RenderedObject<T> {
   }
 }
 
-class RenderedObjects<T> {
+export class RenderedObjects<T> {
   head: RenderedObject<T> | null
   tail: RenderedObject<T> | null
   length: number;
