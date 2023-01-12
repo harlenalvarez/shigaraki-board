@@ -7,6 +7,7 @@ export class Box2D extends ShapesBase {
   height: number;
   radius: number;
   path: Path2D;
+  boxes: RenderedObjects
   constructor(props: Need<Box2D, 'width' | 'height' | 'point'>) {
     super(props)
 

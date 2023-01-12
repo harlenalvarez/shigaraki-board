@@ -27,22 +27,22 @@ class RenderedObjectsMap {
 
 export const renderedObjectsMap = new RenderedObjectsMap();
 
-class RenderedObject {
-  next: RenderedObject | null
-  value: Box2D | Text2D | null
-  prev: RenderedObject | null
-  constructor(value?: Box2D | Text2D) {
+class RenderedObject<T> {
+  next: RenderedObject<T> | null
+  value: T | null
+  prev: RenderedObject<T> | null
+  constructor(value?: T) {
     this.value = value ?? null;
     this.prev = null;
     this.next = null;
   }
 }
 
-class RenderedObjects {
-  head: RenderedObject | null
-  tail: RenderedObject | null
+class RenderedObjects<T> {
+  head: RenderedObject<T> | null
+  tail: RenderedObject<T> | null
   length: number;
-  constructor(latest?: RenderedObject) {
+  constructor(latest?: RenderedObject<T>) {
     this.head = latest ?? null;
     this.tail = null;
     if (this.head) {
@@ -58,7 +58,7 @@ class RenderedObjects {
     this.remove = this.remove.bind(this)
   }
 
-  push(value: Box2D | Text2D) {
+  push(value: T) {
     this.length++;
     const node = new RenderedObject(value);
     if (!this.head) {
@@ -82,7 +82,7 @@ class RenderedObjects {
     this.tail = node;
   }
 
-  remove(node: RenderedObject | null | undefined) {
+  remove(node: RenderedObject<T> | null) {
     if (!node) return null;
     this.length--;
 
@@ -97,25 +97,10 @@ class RenderedObjects {
     if (node === this.head) {
       this.head = node.next;
     }
-
-    return node;
+    return node ?? null;
   }
 
   pop() {
-    // if (!this.tail && this.head) {
-    //   const head = this.head;
-    //   this.head = null;
-    //   return head.value;
-    // }
-
-    // const tail = this.tail as RenderedObject;
-    // if (tail.prev === this.head) {
-    //   this.tail = null;
-    // }
-    // else {
-    //   this.tail = tail.prev;
-    // }
-    // return tail.value;
     if (!this.tail) return this.remove(this.head);
     return this.remove(this.tail);
   }
@@ -145,4 +130,4 @@ class RenderedObjects {
   }
 }
 
-export const renderedObjects = new RenderedObjects()
+export const renderedObjects = new RenderedObjects<Box2D | Text2D>()
