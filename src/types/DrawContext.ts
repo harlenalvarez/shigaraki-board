@@ -1,10 +1,8 @@
-import { Shapes } from './Shapes'
+import { Shapes } from './Shapes';
 
-export type RGBA = [number, number, number, number]
+export type RGBA = [number, number, number, number];
 
-const t: RGBA = [1, 2, 3, 4]
-
-//TODO: add more settings as I think about them
+// TODO: add more settings as I think about them
 export type DrawContext = {
   selectedOption: Shapes
   strokeColor?: string | RGBA
@@ -13,4 +11,4 @@ export type DrawContext = {
   fontType?: string
   fontColor?: string | RGBA
   fontStrokeColor?: string | RGBA
-}
+};

@@ -6,4 +6,3 @@ export const getClickedPoint = (e: { clientX: number, clientY: number }, canvas?
     e.clientY - top
   ];
 };
-

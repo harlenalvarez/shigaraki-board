@@ -1,7 +1,7 @@
 
 export const getLinePattern = (width: number) => {
-  const canvas = document.getElementById('line-pattern')
-}
+  document.getElementById('line-pattern');
+};
 
 export const LinePatterns = () => {
   return (

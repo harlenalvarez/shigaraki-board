@@ -1,37 +1,11 @@
 import { Box2D, isType, Text2D } from '@/types';
-
-type RenderedObjectType = {
-  type: 'Path2D' | 'Text2D'
-  value: Int8Array
-}
-type RenderedMapDTO = Array<{ [key: string]: RenderedMapDTO }>
-
-class RenderedObjectsMap {
-  private _map: Map<string, Box2D | Text2D>;
-  constructor() {
-    this._map = new Map();
-    this.toByteArray = this.toByteArray.bind(this);
-  }
-
-  toByteArray() {
-    const transferObject: RenderedMapDTO = []
-    for (let [key, value] of this._map) {
-      let rawObject = {}
-      if (isType<Path2D>(value, 'addPath')) {
-        //value.
-      }
-      // transferObject.push({[key]:  })
-    }
-  }
-}
-
-export const renderedObjectsMap = new RenderedObjectsMap();
+import { Serializable } from '@/types/ShapesBase';
 
 class RenderedObject<T> {
-  next: RenderedObject<T> | null
-  value: T | null
-  prev: RenderedObject<T> | null
-  constructor(value?: T) {
+  next: RenderedObject<T> | null;
+  value: T | null;
+  prev: RenderedObject<T> | null;
+  constructor (value?: T) {
     this.value = value ?? null;
     this.prev = null;
     this.next = null;
@@ -39,42 +13,45 @@ class RenderedObject<T> {
 }
 
 export class RenderedObjects<T> {
-  head: RenderedObject<T> | null
-  tail: RenderedObject<T> | null
-  length: number;
-  constructor(latest?: RenderedObject<T>) {
+  head: RenderedObject<T> | null;
+  tail: RenderedObject<T> | null;
+  private _length: number;
+  get length () {
+    return this._length;
+  }
+
+  constructor (latest?: RenderedObject<T>) {
     this.head = latest ?? null;
     this.tail = null;
-    if (this.head) {
-      this.length = 1;
-    }
-    else {
-      this.length = 0;
+    if (this.head != null) {
+      this._length = 1;
+    } else {
+      this._length = 0;
     }
     this.push = this.push.bind(this);
     this.pop = this.pop.bind(this);
     this.clear = this.clear.bind(this);
     this.dequeue = this.dequeue.bind(this);
-    this.remove = this.remove.bind(this)
+    this.remove = this.remove.bind(this);
   }
 
-  push(value: T) {
-    this.length++;
+  push (value: T) {
+    this._length++;
     const node = new RenderedObject(value);
-    if (!this.head) {
+    if (this.head == null) {
       this.head = node;
       return;
     }
-    if (!this.head.next) {
+    if (this.head.next == null) {
       this.head.next = node;
       node.prev = this.head;
       this.tail = node;
-      return
+      return;
     }
 
-    if (!this.tail) {
-      this.length--;
-      throw new Error('Tail is empty')
+    if (this.tail == null) {
+      this._length--;
+      throw new Error('Tail is empty');
     }
 
     this.tail.next = node;
@@ -82,14 +59,12 @@ export class RenderedObjects<T> {
     this.tail = node;
   }
 
-  remove(node: RenderedObject<T> | null) {
-    if (!node) return null;
-    this.length--;
+  remove (node: RenderedObject<T> | null) {
+    if (node == null) return null;
+    this._length--;
 
-    if (node.next)
-      node.next.prev = node.prev;
-    if (node.prev)
-      node.prev.next = node.next;
+    if (node.next != null) { node.next.prev = node.prev; }
+    if (node.prev != null) { node.prev.next = node.next; }
 
     if (node === this.tail) {
       this.tail = node.prev;
@@ -100,34 +75,45 @@ export class RenderedObjects<T> {
     return node ?? null;
   }
 
-  pop() {
-    if (!this.tail) return this.remove(this.head);
+  pop () {
+    if (this.tail == null) return this.remove(this.head);
     return this.remove(this.tail);
   }
 
-  dequeue() {
-    if (!this.head) return this.remove(this.tail);
+  dequeue () {
+    if (this.head == null) return this.remove(this.tail);
     return this.remove(this.head);
   }
 
-  *[Symbol.iterator]() {
+  * [Symbol.iterator] () {
     let curr = this.head;
-    while (curr) {
+    while (curr != null) {
       yield curr;
       curr = curr.next;
     }
   }
 
-  clear() {
+  clear () {
     let current = this.head;
-    while (current?.next) {
+    while ((current?.next) != null) {
       current.value = null;
       current = current.next;
     }
     this.head = null;
     this.tail = null;
-    this.length = 0;
+    this._length = 0;
   }
+
+  * toByteArray () {
+    for (const node of this) {
+      if (node.value === null) continue;
+      if (isType<Serializable>(node.value, 'toByteArray')) {
+        yield node.value.toByteArray();
+      }
+    }
+  }
+
+  fromByteArray () { }
 }
 
-export const renderedObjects = new RenderedObjects<Box2D | Text2D>()
+export const renderedObjects = new RenderedObjects<Box2D | Text2D>();

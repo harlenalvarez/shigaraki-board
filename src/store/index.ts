@@ -2,4 +2,3 @@ export { RenderedObjects, renderedObjects as renderedObjectsIntance } from './Ca
 export { CanvasCtxProvider, useCanvasCtx, useSetCanvasCtx } from './CanvasContext/CanvasCtxProvider';
 export { DrawContextProvider } from './DrawContext/DrawContextProvider';
 export { Colors } from './StyleValues/Colors';
-

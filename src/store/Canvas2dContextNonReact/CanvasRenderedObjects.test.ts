@@ -46,7 +46,7 @@ describe('Render object structure', () => {
     expect(renderedObjects.length).toBe(1);
     expect(poppedSecond?.value).toMatchObject({ value: 'second' });
 
-    //pop last (0 reminaing)
+    // pop last (0 reminaing)
     const poppedFirst = renderedObjects.pop();
     expect(renderedObjects.length).toBe(0);
     expect(poppedFirst?.value).toMatchObject({ value: 'test' });
@@ -63,13 +63,12 @@ describe('Render object structure', () => {
     renderedObjects.push(secondObj);
     renderedObjects.push(third);
 
-
     // dequeue first element (2 remaining)
     const dequeue = renderedObjects.dequeue();
     expect(renderedObjects.length).toBe(2);
     expect(dequeue?.value).toMatchObject({ value: 'test' });
 
-    //dequeue second (1 remaining)
+    // dequeue second (1 remaining)
     const second = renderedObjects.dequeue();
     expect(renderedObjects.length).toBe(1);
     expect(second?.value).toMatchObject({ value: 'second' });
@@ -103,17 +102,25 @@ describe('Render object structure', () => {
     renderedObjects.push(secondObj);
     renderedObjects.push(third);
     let index = 0;
-    for (let node of renderedObjects) {
-      if (index === 0)
-        expect(node.value).toMatchObject({ value: 'test' });
-      else if (index === 1)
-        expect(node.value).toMatchObject({ value: 'second' });
-      else if (index === 2)
-        expect(node.value).toMatchObject({ value: 'third' });
-      else
-        expect(true).toBe(false);
+    for (const node of renderedObjects) {
+      if (index === 0) { expect(node.value).toMatchObject({ value: 'test' }); } else if (index === 1) { expect(node.value).toMatchObject({ value: 'second' }); } else if (index === 2) { expect(node.value).toMatchObject({ value: 'third' }); } else { expect(true).toBe(false); }
 
       index++;
     }
-  })
+  });
+
+  test('Should get array stream', () => {
+    renderedObjects.push(firstobjectadded);
+    renderedObjects.push(secondObj);
+    renderedObjects.push(third);
+
+    const iterator = renderedObjects.toByteArray();
+    const { value: firstArray } = iterator.next();
+    expect(firstArray).not.toBeNull();
+    if (firstArray == null) return;
+    const firstObj = Text2D.fromByteArray(firstArray);
+    expect(firstObj).not.toBeNull();
+    if (firstObj == null) return;
+    expect(firstObj.value).toEqual(firstobjectadded.value);
+  });
 });

@@ -7,4 +7,4 @@ export enum Shapes {
 export type Point = {
   x: number
   y: number
-}
+};

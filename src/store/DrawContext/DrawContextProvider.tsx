@@ -1,12 +1,7 @@
 import { createContext } from 'react';
 
-
-
 export const DrawContext = createContext(null);
 export const DrawContextDispatch = createContext(null);
-
-
-
 
 export const DrawContextProvider = () => {
   return (
@@ -15,5 +10,5 @@ export const DrawContextProvider = () => {
 
       </DrawContextDispatch.Provider>
     </DrawContext.Provider>
-  )
-}
+  );
+};
