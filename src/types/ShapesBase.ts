@@ -15,14 +15,14 @@ export class ShapesBase {
   static decoder: TextDecoder = new TextDecoder();
   point: Point;
   private _color?: string;
-  get color (): string {
+  get color(): string {
     if (!this._color) {
       throw new Error('color not set');
     }
     return this._color;
   }
 
-  set color (value: string | RGBA) {
+  set color(value: string | RGBA) {
     if (value instanceof Array) {
       this._color = `rgba(${value.join(',')})`;
     } else {
@@ -31,11 +31,11 @@ export class ShapesBase {
   }
 
   private _strokeColor?: string;
-  get strokeColor (): string | undefined {
+  get strokeColor(): string | undefined {
     return this._strokeColor;
   }
 
-  set strokeColor (value: string | RGBA | undefined) {
+  set strokeColor(value: string | RGBA | undefined) {
     if (value instanceof Array) {
       this._strokeColor = `rgba(${value.join(',')})`;
     } else if (value) {
@@ -43,18 +43,22 @@ export class ShapesBase {
     }
   }
 
-  constructor (props: Need<ShapesBase, 'point'>) {
+  constructor(props: Need<ShapesBase, 'point'>) {
     this.point = props.point;
     this.color = props.color ?? Colors.TextDark;
     this.strokeColor = props.strokeColor;
     this.toJson = this.toJson.bind(this);
   }
 
-  toJson () {
+  toJson() {
     return {
       point: this.point,
       color: this.color,
       strokeColor: this.strokeColor
     };
+  }
+
+  draw(_: CanvasRenderingContext2D) {
+    throw new Error('Draw method was not implmented');
   }
 }
