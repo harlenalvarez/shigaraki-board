@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { Text2D } from '../Text2D';
+import { Text2D } from '../canvas-shapes/Text2D';
 
 describe('Text2D', () => {
   test('Should return byte array and create object from byte array', () => {

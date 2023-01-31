@@ -1,14 +1,15 @@
 import { RenderedObjects } from '@/store';
-import { hasMagicNumber } from '@/utils/bytes.helpers';
-import { Need } from './reducer';
-import { Serializable, ShapesBase } from './ShapesBase';
+import { hasMagicNumber } from '@/utils';
+import { Need } from '../reducer';
+import { Serializable, ShapesBase } from '../ShapesBase';
+import { MagicNumbers } from './ShapesService';
 
 export class Box2D extends ShapesBase implements Serializable {
   width: number;
   height: number;
   radius: number;
   path: Path2D;
-  boxes: RenderedObjects<Box2D> = new RenderedObjects();
+  boxes: RenderedObjects = new RenderedObjects();
   constructor (props: Need<Box2D, 'width' | 'height' | 'point'>) {
     super(props);
 
@@ -60,15 +61,15 @@ export class Box2D extends ShapesBase implements Serializable {
   toByteArray () {
     const json = this.toJson();
     const bytes = this.encoder.encode(JSON.stringify(json));
-    const magicPrefix = new Uint8Array(Box2D.magicNumber.length + bytes.length);
-    magicPrefix.set(Box2D.magicNumber);
-    magicPrefix.set(bytes, Box2D.magicNumber.length);
+    const magicPrefix = new Uint8Array(MagicNumbers.box.length + bytes.length);
+    magicPrefix.set(MagicNumbers.box);
+    magicPrefix.set(bytes, MagicNumbers.box.length);
     return magicPrefix;
   }
 
   static fromByteArray (payload: Uint8Array) {
     if (!Box2D.byteArrayIsTypeOf(payload)) return null;
-    const fullString = ShapesBase.decoder.decode(payload.slice(Box2D.magicNumber.length));
+    const fullString = ShapesBase.decoder.decode(payload.slice(MagicNumbers.box.length));
     const thisJson = JSON.parse(fullString) as Box2D;
     const { boxes, ...mainJson } = thisJson;
     const parent = new Box2D(mainJson);
@@ -79,11 +80,7 @@ export class Box2D extends ShapesBase implements Serializable {
     return parent;
   };
 
-  static get magicNumber () {
-    return new Uint8Array([0x95, 0x76, 0xD5, 0xFF]);
-  }
-
   static byteArrayIsTypeOf (payload: Uint8Array) {
-    return hasMagicNumber(payload, Box2D.magicNumber);
+    return hasMagicNumber(payload, MagicNumbers.box);
   }
 }

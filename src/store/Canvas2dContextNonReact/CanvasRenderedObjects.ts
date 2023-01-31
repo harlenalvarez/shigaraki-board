@@ -1,26 +1,26 @@
-import { Box2D, isType, Text2D } from '@/types';
-import { Serializable } from '@/types/ShapesBase';
+import { Box2D, isType, Serializable, ShapesBase, ShapeTypes, Text2D } from '@/types';
+import { findShape } from '@/utils';
 
 class RenderedObject<T> {
   next: RenderedObject<T> | null;
   value: T | null;
   prev: RenderedObject<T> | null;
-  constructor (value?: T) {
+  constructor(value?: T) {
     this.value = value ?? null;
     this.prev = null;
     this.next = null;
   }
 }
 
-export class RenderedObjects<T> {
-  head: RenderedObject<T> | null;
-  tail: RenderedObject<T> | null;
+export class RenderedObjects {
+  head: RenderedObject<ShapesBase> | null;
+  tail: RenderedObject<ShapesBase> | null;
   private _length: number;
-  get length () {
+  get length() {
     return this._length;
   }
 
-  constructor (latest?: RenderedObject<T>) {
+  constructor(latest?: RenderedObject<ShapesBase>) {
     this.head = latest ?? null;
     this.tail = null;
     if (this.head != null) {
@@ -28,14 +28,9 @@ export class RenderedObjects<T> {
     } else {
       this._length = 0;
     }
-    this.push = this.push.bind(this);
-    this.pop = this.pop.bind(this);
-    this.clear = this.clear.bind(this);
-    this.dequeue = this.dequeue.bind(this);
-    this.remove = this.remove.bind(this);
   }
 
-  push (value: T) {
+  push(value: ShapesBase) {
     this._length++;
     const node = new RenderedObject(value);
     if (this.head == null) {
@@ -59,7 +54,7 @@ export class RenderedObjects<T> {
     this.tail = node;
   }
 
-  remove (node: RenderedObject<T> | null) {
+  remove(node: RenderedObject<ShapesBase> | null) {
     if (node == null) return null;
     this._length--;
 
@@ -75,17 +70,17 @@ export class RenderedObjects<T> {
     return node ?? null;
   }
 
-  pop () {
+  pop() {
     if (this.tail == null) return this.remove(this.head);
     return this.remove(this.tail);
   }
 
-  dequeue () {
+  dequeue() {
     if (this.head == null) return this.remove(this.tail);
     return this.remove(this.head);
   }
 
-  * [Symbol.iterator] () {
+  *[Symbol.iterator]() {
     let curr = this.head;
     while (curr != null) {
       yield curr;
@@ -93,7 +88,7 @@ export class RenderedObjects<T> {
     }
   }
 
-  clear () {
+  clear() {
     let current = this.head;
     while ((current?.next) != null) {
       current.value = null;
@@ -104,7 +99,7 @@ export class RenderedObjects<T> {
     this._length = 0;
   }
 
-  * toByteArray () {
+  * toByteArray() {
     for (const node of this) {
       if (node.value === null) continue;
       if (isType<Serializable>(node.value, 'toByteArray')) {
@@ -113,7 +108,32 @@ export class RenderedObjects<T> {
     }
   }
 
-  fromByteArray () { }
+  fromByteArray(nodes: ArrayBufferLike[] | Uint8Array[]) {
+    if (nodes[0] instanceof ArrayBuffer) {
+      return this.fromUint8ByteArray(nodes.map(node => new Uint8Array(node)));
+    } else {
+      return this.fromUint8ByteArray(nodes as Uint8Array[]);
+    }
+  }
+
+  fromUint8ByteArray(nodes: Uint8Array[]) {
+    for (let node of nodes) {
+      const type = findShape(node.subarray(0, 5));
+      this.parseAndPush(node, type);
+    }
+  }
+
+  parseAndPush(node: Uint8Array, nodeType: number) {
+    if (nodeType & ShapeTypes.box) {
+      const textNode = Box2D.fromByteArray(node);
+      if (textNode === null) throw new Error('Failed to parse');
+      this.push(textNode);
+    } else {
+      const boxNode = Text2D.fromByteArray(node);
+      if (boxNode === null) throw new Error('Failed to parse box node');
+      this.push(boxNode);
+    }
+  }
 }
 
-export const renderedObjects = new RenderedObjects<Box2D | Text2D>();
+export const renderedObjects = new RenderedObjects();

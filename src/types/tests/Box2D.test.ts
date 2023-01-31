@@ -1,14 +1,8 @@
-import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { Box2D } from '../Box2D';
-import { Text2D } from '../Text2D';
+import { describe, expect, test } from 'vitest';
+import { Box2D } from '../canvas-shapes/Box2D';
+import { Text2D } from '../canvas-shapes/Text2D';
 
 describe('Box2D tests', () => {
-  beforeAll(() => {
-    vi.stubGlobal('Path2D', vi.fn(() => ({
-      rect: vi.fn(),
-      roundRect: vi.fn()
-    })));
-  });
 
   test('Should get array buffer and create from buffer', () => {
     const box = new Box2D({
@@ -56,7 +50,4 @@ describe('Box2D tests', () => {
     expect(result).toBe(false);
   });
 
-  afterAll(() => {
-    vi.unstubAllGlobals();
-  });
 });

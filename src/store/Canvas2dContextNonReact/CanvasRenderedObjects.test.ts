@@ -1,4 +1,4 @@
-import { Text2D } from '@/types/Text2D';
+import { Text2D } from '@/types';
 import { afterEach, describe, expect, test } from 'vitest';
 import { renderedObjects } from './CanvasRenderedObjects';
 
@@ -122,5 +122,16 @@ describe('Render object structure', () => {
     expect(firstObj).not.toBeNull();
     if (firstObj == null) return;
     expect(firstObj.value).toEqual(firstobjectadded.value);
+  });
+
+  test('Should populate objects from array stream', () => {
+    renderedObjects.push(firstobjectadded);
+    renderedObjects.push(secondObj);
+    renderedObjects.push(third);
+    const arrayObjects = [...renderedObjects.toByteArray()];
+    renderedObjects.clear();
+    renderedObjects.fromByteArray(arrayObjects);
+    expect(renderedObjects.length).toBe(3);
+    expect(renderedObjects.head?.value).toMatchObject({ value: 'test' });
   });
 });

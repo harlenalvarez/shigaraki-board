@@ -1,7 +1,8 @@
 import { Colors } from '@/store';
-import { hasMagicNumber } from '@/utils/bytes.helpers';
-import { Need } from './reducer';
-import { Serializable, ShapesBase } from './ShapesBase';
+import { hasMagicNumber } from '@/utils';
+import { Need } from '../reducer';
+import { Serializable, ShapesBase } from '../ShapesBase';
+import { MagicNumbers } from './ShapesService';
 
 export class Text2D extends ShapesBase implements Serializable {
   value: string;
@@ -55,24 +56,20 @@ export class Text2D extends ShapesBase implements Serializable {
     };
     const string = JSON.stringify(textJson);
     const objectArray = this.encoder.encode(string);
-    const magicPrefix = new Uint8Array(Text2D.magicNumber.length + objectArray.length);
-    magicPrefix.set(Text2D.magicNumber);
-    magicPrefix.set(objectArray, Text2D.magicNumber.length);
+    const magicPrefix = new Uint8Array(MagicNumbers.text.length + objectArray.length);
+    magicPrefix.set(MagicNumbers.text);
+    magicPrefix.set(objectArray, MagicNumbers.text.length);
     return magicPrefix;
   }
 
   static fromByteArray (payload: Uint8Array) {
     if (!Text2D.byteArrayIsTypeOf(payload)) return null;
-    const decodedPayload = ShapesBase.decoder.decode(payload.slice(Text2D.magicNumber.length));
+    const decodedPayload = ShapesBase.decoder.decode(payload.subarray(MagicNumbers.text.length));
     const textJson = JSON.parse(decodedPayload) as Text2D;
     return new Text2D(textJson);
   }
 
-  static get magicNumber () {
-    return new Uint8Array([0x95, 0xB6, 0xD6, 0x1F]);
-  }
-
   static byteArrayIsTypeOf (payload: Uint8Array) {
-    return hasMagicNumber(payload, Text2D.magicNumber);
+    return hasMagicNumber(payload, MagicNumbers.text);
   }
 }
