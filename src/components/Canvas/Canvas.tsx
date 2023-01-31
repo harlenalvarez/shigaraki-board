@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useSetCanvasCtx } from '@/store';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 
 export const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const setCtx = useSetCanvasCtx();
-  console.log('rendering');
+
   useLayoutEffect(() => {
     handleSetCurrentHeight();
     // handleStyledSize();
