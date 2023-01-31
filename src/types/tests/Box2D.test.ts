@@ -3,7 +3,6 @@ import { Box2D } from '../canvas-shapes/Box2D';
 import { Text2D } from '../canvas-shapes/Text2D';
 
 describe('Box2D tests', () => {
-
   test('Should get array buffer and create from buffer', () => {
     const box = new Box2D({
       width: 100,
@@ -49,5 +48,4 @@ describe('Box2D tests', () => {
     const result = Text2D.byteArrayIsTypeOf(boxArray);
     expect(result).toBe(false);
   });
-
 });

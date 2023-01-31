@@ -5,7 +5,7 @@ class RenderedObject<T> {
   next: RenderedObject<T> | null;
   value: T | null;
   prev: RenderedObject<T> | null;
-  constructor(value?: T) {
+  constructor (value?: T) {
     this.value = value ?? null;
     this.prev = null;
     this.next = null;
@@ -16,11 +16,11 @@ export class RenderedObjects {
   head: RenderedObject<ShapesBase> | null;
   tail: RenderedObject<ShapesBase> | null;
   private _length: number;
-  get length() {
+  get length () {
     return this._length;
   }
 
-  constructor(latest?: RenderedObject<ShapesBase>) {
+  constructor (latest?: RenderedObject<ShapesBase>) {
     this.head = latest ?? null;
     this.tail = null;
     if (this.head != null) {
@@ -30,7 +30,7 @@ export class RenderedObjects {
     }
   }
 
-  push(value: ShapesBase) {
+  push (value: ShapesBase) {
     this._length++;
     const node = new RenderedObject(value);
     if (this.head == null) {
@@ -54,7 +54,7 @@ export class RenderedObjects {
     this.tail = node;
   }
 
-  remove(node: RenderedObject<ShapesBase> | null) {
+  remove (node: RenderedObject<ShapesBase> | null) {
     if (node == null) return null;
     this._length--;
 
@@ -70,17 +70,17 @@ export class RenderedObjects {
     return node ?? null;
   }
 
-  pop() {
+  pop () {
     if (this.tail == null) return this.remove(this.head);
     return this.remove(this.tail);
   }
 
-  dequeue() {
+  dequeue () {
     if (this.head == null) return this.remove(this.tail);
     return this.remove(this.head);
   }
 
-  *[Symbol.iterator]() {
+  * [Symbol.iterator] () {
     let curr = this.head;
     while (curr != null) {
       yield curr;
@@ -88,7 +88,7 @@ export class RenderedObjects {
     }
   }
 
-  clear() {
+  clear () {
     let current = this.head;
     while ((current?.next) != null) {
       current.value = null;
@@ -99,7 +99,7 @@ export class RenderedObjects {
     this._length = 0;
   }
 
-  * toByteArray() {
+  * toByteArray () {
     for (const node of this) {
       if (node.value === null) continue;
       if (isType<Serializable>(node.value, 'toByteArray')) {
@@ -108,7 +108,7 @@ export class RenderedObjects {
     }
   }
 
-  fromByteArray(nodes: ArrayBufferLike[] | Uint8Array[]) {
+  fromByteArray (nodes: ArrayBufferLike[] | Uint8Array[]) {
     if (nodes[0] instanceof ArrayBuffer) {
       return this.fromUint8ByteArray(nodes.map(node => new Uint8Array(node)));
     } else {
@@ -116,14 +116,14 @@ export class RenderedObjects {
     }
   }
 
-  fromUint8ByteArray(nodes: Uint8Array[]) {
-    for (let node of nodes) {
+  fromUint8ByteArray (nodes: Uint8Array[]) {
+    for (const node of nodes) {
       const type = findShape(node.subarray(0, 5));
       this.parseAndPush(node, type);
     }
   }
 
-  parseAndPush(node: Uint8Array, nodeType: number) {
+  parseAndPush (node: Uint8Array, nodeType: number) {
     if (nodeType & ShapeTypes.box) {
       const textNode = Box2D.fromByteArray(node);
       if (textNode === null) throw new Error('Failed to parse');
