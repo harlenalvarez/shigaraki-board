@@ -7,7 +7,7 @@ addEventListener('message', (ev) => {
     console.error('Offline not available');
     return;
   }
-  ctx.fillStyle = "green";
+  ctx.fillStyle = 'green';
   ctx.fillRect(10, 10, 150, 100);
 });
 

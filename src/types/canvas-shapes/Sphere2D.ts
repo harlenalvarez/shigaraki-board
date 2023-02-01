@@ -17,7 +17,7 @@ export class Sphere2D extends ShapesBase implements Serializable {
     this.path.arc(this.point.x, this.point.y, this.radius, 0, 2 * Math.PI);
   }
 
-  toJson(): { point: Point; color: string; strokeColor: string | undefined; } {
+  toJson(): { point: Point, color: string, strokeColor: string | undefined } {
     const baseJson = super.toJson();
     const fullJson = {
       ...baseJson,
@@ -64,5 +64,4 @@ export class Sphere2D extends ShapesBase implements Serializable {
       ctx.stroke(this.path);
     }
   }
-
 }

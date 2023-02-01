@@ -10,7 +10,7 @@ export class Box2D extends ShapesBase implements Serializable {
   radius: number;
   path: Path2D;
   boxes: RenderedObjects = new RenderedObjects();
-  constructor (props: Need<Box2D, 'width' | 'height' | 'point'>) {
+  constructor(props: Need<Box2D, 'width' | 'height' | 'point'>) {
     super(props);
 
     this.point = props.point;
@@ -24,10 +24,9 @@ export class Box2D extends ShapesBase implements Serializable {
     this.draw = this.draw.bind(this);
   }
 
-  draw (ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.restore();
     ctx.beginPath();
-
     if (this.color !== '') {
       ctx.fillStyle = this.color;
       ctx.fill(this.path);
@@ -39,7 +38,7 @@ export class Box2D extends ShapesBase implements Serializable {
     }
   }
 
-  toJson () {
+  toJson() {
     const baseJson = super.toJson();
     const fullJson = {
       ...baseJson,
@@ -58,7 +57,7 @@ export class Box2D extends ShapesBase implements Serializable {
     return fullJson;
   }
 
-  toByteArray () {
+  toByteArray() {
     const json = this.toJson();
     const bytes = this.encoder.encode(JSON.stringify(json));
     const magicPrefix = new Uint8Array(MagicNumbers.box.length + bytes.length);
@@ -67,7 +66,7 @@ export class Box2D extends ShapesBase implements Serializable {
     return magicPrefix;
   }
 
-  static fromByteArray (payload: Uint8Array) {
+  static fromByteArray(payload: Uint8Array) {
     if (!Box2D.byteArrayIsTypeOf(payload)) return null;
     const fullString = ShapesBase.decoder.decode(payload.slice(MagicNumbers.box.length));
     const thisJson = JSON.parse(fullString) as Box2D;
@@ -80,7 +79,7 @@ export class Box2D extends ShapesBase implements Serializable {
     return parent;
   };
 
-  static byteArrayIsTypeOf (payload: Uint8Array) {
+  static byteArrayIsTypeOf(payload: Uint8Array) {
     return hasMagicNumber(payload, MagicNumbers.box);
   }
 }
