@@ -1,10 +1,11 @@
+import { ShapeTypeKeys } from '@/types';
 import { DivHandler } from './DivHandler';
 import { LineHandler } from './LineHandler';
 import { SphereHandler } from './SphereHandler';
 
-const Hanlders = new Map<string, React.FunctionComponent>();
+const Hanlders = new Map<ShapeTypeKeys, React.FunctionComponent>();
 Hanlders.set('line', LineHandler);
-Hanlders.set('div', DivHandler);
+Hanlders.set('box', DivHandler);
 Hanlders.set('sphere', SphereHandler);
 
 export { Hanlders };

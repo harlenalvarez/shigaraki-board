@@ -4,11 +4,11 @@ import { Point } from '../Shapes';
 import { Serializable, ShapesBase } from '../ShapesBase';
 import { MagicNumbers } from './ShapesService';
 
-export class Sphere2D extends ShapesBase implements Serializable {
+export class Node2D extends ShapesBase implements Serializable {
   radius: number;
   path: Path2D;
 
-  constructor(props: Need<Sphere2D, 'radius' | 'point'>) {
+  constructor(props: Need<Node2D, 'radius' | 'point'>) {
     super(props);
     this.radius = props.radius;
     this.point = props.point;
@@ -39,10 +39,10 @@ export class Sphere2D extends ShapesBase implements Serializable {
   }
 
   static fromByteArray(payload: Uint8Array) {
-    if (!Sphere2D.byteArrayIsTypeOf(payload)) return null;
+    if (!Node2D.byteArrayIsTypeOf(payload)) return null;
     const fullString = ShapesBase.decoder.decode(payload.slice(MagicNumbers.box.length));
-    const thisJson = JSON.parse(fullString) as Sphere2D;
-    const parent = new Sphere2D(thisJson);
+    const thisJson = JSON.parse(fullString) as Node2D;
+    const parent = new Node2D(thisJson);
     return parent;
   };
 

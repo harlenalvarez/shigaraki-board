@@ -24,7 +24,6 @@ export const Canvas = () => {
     canvasRef.current.style.width = `${width}px`;
     canvasRef.current.style.height = `${height}px`;
     ctx.scale(ratio, ratio);
-    ctx.save();
     ctx.putImageData(data, 0, 0);
     setCtx(ctx);
   }, []);
