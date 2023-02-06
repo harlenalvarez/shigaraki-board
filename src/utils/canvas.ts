@@ -11,9 +11,9 @@ export const getClickedPoint = (e: { clientX: number, clientY: number }, canvas?
 };
 
 export const clearCanvas = (ctx: CanvasRenderingContext2D) => {
-  const { width, height } = ctx.canvas.getBoundingClientRect()
+  const { width, height } = ctx.canvas.getBoundingClientRect();
   ctx.clearRect(0, 0, width, height);
-}
+};
 
 export const getMidPoint = (point1: Point, point2: Point): Point => {
   return { x: (point1.x + point2.x) / 2, y: (point1.y + point2.y) / 2 };
@@ -23,7 +23,7 @@ export const getSlope = (point1: Point, point2: Point, margin: number = 1) => {
   if (Math.abs(point1.x - point2.x) < margin) return 0;
   const slope = (point2.y - point1.y) / (point2.x - point1.x);
   return Math.round((slope + Number.EPSILON) * 10) / 10;
-}
+};
 
 export const getDistance = (point1: Point, point2: Point): number => {
   const squared = Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2);
@@ -51,7 +51,7 @@ const positionMap = {
   1: CanvasNodeConnPosition.right,
   2: CanvasNodeConnPosition.bottom,
   3: CanvasNodeConnPosition.left
-}
+};
 
 const findClosestPoint = (nodePoints: Point[], midPoint: Point): { point: Point, position: CanvasNodeConnPosition } => {
   let closestPoint: [Point, number, number] = [{ x: 0, y: 0 }, Number.MAX_SAFE_INTEGER, -1];
@@ -64,8 +64,8 @@ const findClosestPoint = (nodePoints: Point[], midPoint: Point): { point: Point,
     }
   }
   const index = closestPoint[2] as keyof typeof positionMap;
-  return { point: closestPoint[0], position: positionMap[`${index}`] }
-}
+  return { point: closestPoint[0], position: positionMap[`${index}`] };
+};
 
 export const getConnectionPoints = (nodeA: CanvasNode, nodeB: CanvasNode, gap: number = 0): CanvasNodeConnections => {
   const midPoint = getMidPoint(nodeA.point, nodeB.point);
@@ -75,4 +75,4 @@ export const getConnectionPoints = (nodeA: CanvasNode, nodeB: CanvasNode, gap: n
   const nodeAConnection = findClosestPoint(nodeAPoints, midPoint);
   const nodeBConnection = findClosestPoint(nodeBPoints, midPoint);
   return { nodeA: nodeAConnection, nodeB: nodeBConnection };
-}
+};

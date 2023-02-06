@@ -6,7 +6,7 @@ export type Point = {
 export type CanvasNode = {
   point: Point
   radius: number
-}
+};
 
 export enum CanvasNodeConnPosition {
   top = 0b1,
@@ -15,6 +15,6 @@ export enum CanvasNodeConnPosition {
   left = 0b1000
 }
 export type CanvasNodeConnections = {
-  nodeA: { point: Point, position: CanvasNodeConnPosition },
+  nodeA: { point: Point, position: CanvasNodeConnPosition }
   nodeB: { point: Point, position: CanvasNodeConnPosition }
-}
+};

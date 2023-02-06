@@ -5,4 +5,3 @@ export { createActions, createReducer, isType } from './reducer';
 export type { Action, ActionDispatchType, CreateReducerFunction, Need, Optional, ReducerActions } from './reducer';
 export type { CanvasNode, Point } from './Shapes';
 export * from './ShapesBase';
-

@@ -12,8 +12,6 @@ export const SphereHandler = () => {
   const [drawCanvas] = useRenderedObjectsDraw(renderedObjectsIntance);
   const [drawText] = useRenderedObjectsDraw(renderedText);
 
-
-
   const handleClick = (e: React.MouseEvent) => {
     if (ctx == null) return;
     e.preventDefault();
@@ -52,12 +50,11 @@ export const SphereHandler = () => {
       ctx.stroke();
     }
 
-
     // lets connect the two shapes
-    const prevBeforeAdd = renderedObjectsIntance.head?.value
+    const prevBeforeAdd = renderedObjectsIntance.head?.value;
 
-    for (let prevObj of renderedObjectsIntance) {
-      const prev = prevObj.value
+    for (const prevObj of renderedObjectsIntance) {
+      const prev = prevObj.value;
 
       if (prev === prevBeforeAdd) continue;
       if (!prevBeforeAdd || !prev) {
@@ -73,24 +70,20 @@ export const SphereHandler = () => {
         ctx.beginPath();
         ctx.moveTo(nodeA.point.x, nodeA.point.y);
         // we want to move toward the midPoint with a quadratic curve
-        //if bottom or top start with nodes
+        // if bottom or top start with nodes
         let radius = 30;
         const slope = getSlope(nodeA.point, midPoint, radius * 2);
         if (!slope) {
           ctx.lineTo(nodeB.point.x, nodeB.point.y);
-        }
-        else if (nodeA.position & (CanvasNodeConnPosition.top | CanvasNodeConnPosition.bottom)) {
-
-          if (-0.2 < slope && slope < 0.2) {
+        } else if (nodeA.position & (CanvasNodeConnPosition.top | CanvasNodeConnPosition.bottom)) {
+          if (slope > -0.2 && slope < 0.2) {
             radius = 3;
           }
           ctx.arcTo(nodeA.point.x, midPoint.y, midPoint.x, midPoint.y, radius);
           ctx.arcTo(nodeB.point.x, midPoint.y, nodeB.point.x, nodeB.point.y, radius);
           ctx.lineTo(nodeB.point.x, nodeB.point.y);
-
-        }
-        else {
-          if (-0.2 < slope && slope < 0.2) {
+        } else {
+          if (slope > -0.2 && slope < 0.2) {
             //   ctx.quadraticCurveTo(midPoint.x, nodeA.point.y, midPoint.x, midPoint.y);
             //   ctx.quadraticCurveTo(midPoint.x, nodeB.point.y, nodeB.point.x, nodeB.point.y);
             radius = 3;
@@ -99,13 +92,10 @@ export const SphereHandler = () => {
           ctx.arcTo(midPoint.x, nodeA.point.y, midPoint.x, midPoint.y, radius);
           ctx.arcTo(midPoint.x, nodeB.point.y, nodeB.point.x, nodeB.point.y, radius);
           ctx.lineTo(nodeB.point.x, nodeB.point.y);
-
         }
 
         ctx.lineWidth = 3;
         ctx.stroke();
-
-
       }
     }
     drawCanvas();
