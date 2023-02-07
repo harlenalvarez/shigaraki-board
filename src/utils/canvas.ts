@@ -1,4 +1,4 @@
-import { CanvasNode, Point } from '@/types';
+import { CanvasNode, Optional, Point } from '@/types';
 import { CanvasNodeConnections, CanvasNodeConnPosition } from '@/types/Shapes';
 
 export const getClickedPoint = (e: { clientX: number, clientY: number }, canvas?: HTMLCanvasElement): [number, number] => {
@@ -35,9 +35,9 @@ export const getDistance = (point1: Point, point2: Point): number => {
 
 // Normally we would use cos sin to get the edge at x, y, but we're not connecting directly to the circle ( there is a gap)
 // so I figure it will be less intensive to simply get the points by just using the radius with a gap
-export const getNodeAttachentPoints = (point: Point, radius: number, gap: number = 0, points: 4 | 8 = 4): Point[] => {
+export const getNodeAttachentPoints = (point: Point, radius: number, gap: number = 0): Point[] => {
   const gapRadius = radius + gap;
-  // const topWithTrig = { x: point.x + gapRadius * Math.cos(Math.PI * 1.5), y: point.y + gapRadius * Math.sin(Math.PI * 1.5) };
+  //const top = { x: point.x + gapRadius * Math.cos(Math.PI * 1.5), y: point.y + gapRadius * Math.sin(Math.PI * 1.5) };
   const top = { x: point.x, y: point.y - gapRadius };
   const right = { x: point.x + gapRadius, y: point.y };
   const bottom = { x: point.x, y: point.y + gapRadius };
@@ -76,3 +76,58 @@ export const getConnectionPoints = (nodeA: CanvasNode, nodeB: CanvasNode, gap: n
   const nodeBConnection = findClosestPoint(nodeBPoints, midPoint);
   return { nodeA: nodeAConnection, nodeB: nodeBConnection };
 };
+export enum NodeSection {
+  oneFourth = 1.5,
+  half = 2,
+  threeFourth = 1.5,
+  full = 1
+}
+export type nodeArcAutoPositionProps = {
+  center: Point,
+  centerRadius: number,
+  nodesRadius: number,
+  nodesCount: number,
+  startAngle: number,
+  gap: number,
+  section: NodeSection
+}
+/**
+ * Given point, a node radius size and node amount, it will return a method to that generates a nodes in a circle
+ */
+export const nodeArcAutoPosition = ({ center, centerRadius, nodesRadius, nodesCount, startAngle = 0, gap = 10, section = NodeSection.full }: Optional<nodeArcAutoPositionProps, 'startAngle' | 'gap' | 'section'>) => {
+  const nodesSectionCount = nodesCount * section;
+  if (nodesSectionCount < 1) { throw new Error('Node Arc Auto Poisition did not recieved a node count'); }
+
+  const diameterOfEachNode = nodesRadius * 2 + gap;
+  const neededCircumference = diameterOfEachNode * nodesSectionCount;
+  const lvlRadius = (neededCircumference / (2 * Math.PI)) * 1.3;
+  const offsetAngle = startAngle - 90;
+  const levelRadius = centerRadius + lvlRadius; //
+  const placementRadius = (lvlRadius / 1.3) + centerRadius;
+
+  let sectionCircumference = neededCircumference;
+  if (section != NodeSection.full) {
+    sectionCircumference = ((0.5 * Math.PI) / (2 * Math.PI)) * neededCircumference;
+  }
+  const angleStep = (diameterOfEachNode / neededCircumference) * 360;
+
+  function positionNode(index: number): Point {
+    const radiansAngle = (index * angleStep + offsetAngle) * (Math.PI / 180)
+    const x = Math.cos(radiansAngle) * placementRadius + center.x;
+    const y = Math.sin(radiansAngle) * placementRadius + center.y;
+    return { x, y };
+  }
+  return { levelRadius, placementRadius, positionNode }
+}
+
+
+// 90/360 = x/circumference
+// .5PI/2PI = x/circum
+// (0.5PI/2PI) * circm = x
+// x/360 = nodeDia/circumference
+// x = (nodeDia/circumference)*360
+
+// 10 = 1.3 20 = x
+// 1.3 * 20 = 10x
+// 2.6 = 10x
+// 2.6/10 = x
