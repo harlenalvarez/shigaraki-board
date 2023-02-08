@@ -163,7 +163,7 @@ export const SphereHandler = () => {
     renderedObjectsIntance.push(sphere);
     for (let index = 0; index < 10; index++) {
       const { x, y } = positionNode(index);
-      const sphere = new Node2D({ radius: level1NodeRadius, point: { x, y }, color: '#ccc', text: `${index + 1}`, fontColor: '#333943', progress: Math.floor(Math.random() * 101) });
+      const sphere = new Node2D({ radius: level1NodeRadius, point: { x, y }, color: '#ccc', text: `${index + 1}`, fontColor: '#333943', strokeColor: '#FFF', progress: Math.floor(Math.random() * 101) });
       renderedObjectsIntance.push(sphere);
     }
     connectAndRender(ctx, drawCanvas, drawText, false);

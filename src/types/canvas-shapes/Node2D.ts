@@ -1,4 +1,4 @@
-import { hasMagicNumber, translateAngle } from '@/utils';
+import { fromAlpaToHex, hasMagicNumber, translateAngle } from '@/utils';
 import { Need } from '../reducer';
 import { Point } from '../Shapes';
 import { Serializable, ShapesBase } from '../ShapesBase';
@@ -87,6 +87,9 @@ export class Node2D extends ShapesBase implements Serializable {
 
     if (this.strokeColor != null && this.strokeColor !== '') {
       ctx.strokeStyle = this.strokeColor;
+      if (this.rgbaColor && this.rgbaColor[3] < 1) {
+        ctx.strokeStyle += fromAlpaToHex(this.rgbaColor[3]);
+      }
       ctx.lineWidth = 4;
       ctx.stroke(this.path);
     }
@@ -105,11 +108,7 @@ export class Node2D extends ShapesBase implements Serializable {
       };
       ctx.strokeStyle = this.progress < 26 ? colors.risk : this.progress < 51 ? colors.medium : this.progress < 76 ? colors.onplan : colors.above;
       if (this.rgbaColor && this.rgbaColor[3] < 1) {
-        console.log('HERE');
-        const percentage = this.rgbaColor[3] * 100;
-        const decimalValue = Math.round((percentage * 255) / 100);
-        console.log(decimalValue.toString(16));
-        ctx.strokeStyle += decimalValue.toString(16);
+        ctx.strokeStyle += fromAlpaToHex(this.rgbaColor[3]);
       }
       ctx.stroke(this.progressPath);
     }

@@ -128,6 +128,13 @@ export const nodeArcAutoPosition = ({ center, centerRadius, nodesRadius, nodesCo
   return { levelRadius, placementRadius, positionNode };
 };
 
+export const fromAlpaToHex = (alpa: number) => {
+  if (alpa > 1) return '';
+  const percentage = alpa * 100;
+  const decimalValue = Math.round((percentage * 255) / 100);
+  return decimalValue.toString(16);
+}
+
 // 90/360 = x/circumference
 // .5PI/2PI = x/circum
 // (0.5PI/2PI) * circm = x
