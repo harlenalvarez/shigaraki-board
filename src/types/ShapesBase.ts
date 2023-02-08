@@ -15,6 +15,7 @@ export class ShapesBase {
   static decoder: TextDecoder = new TextDecoder();
   point: Point;
   private _color?: string;
+  rgbaColor?: RGBA;
   get color(): string {
     if (!this._color) {
       throw new Error('color not set');
@@ -24,8 +25,10 @@ export class ShapesBase {
 
   set color(value: string | RGBA) {
     if (value instanceof Array) {
+      this.rgbaColor = value;
       this._color = `rgba(${value.join(',')})`;
     } else {
+      this.rgbaColor = undefined;
       this._color = value;
     }
   }
@@ -41,6 +44,15 @@ export class ShapesBase {
     } else if (value) {
       this._strokeColor = value;
     }
+  }
+
+  private _strokeWidth?: number;
+  get strokeWidth(): number | undefined {
+    return this._strokeWidth;
+  }
+
+  set strokeWidth(value: number | undefined) {
+    this.strokeWidth = value;
   }
 
   constructor(props: Need<ShapesBase, 'point'>) {

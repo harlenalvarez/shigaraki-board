@@ -1,12 +1,23 @@
 import { CanvasNode, Optional, Point } from '@/types';
 import { CanvasNodeConnections, CanvasNodeConnPosition } from '@/types/Shapes';
 
-export const getClickedPoint = (e: { clientX: number, clientY: number }, canvas?: HTMLCanvasElement): [number, number] => {
-  if (canvas == null) throw new Error('Canvas argument is undefined');
-  const { left, top } = canvas.getBoundingClientRect();
+
+export const translateAngle = (angle: number) => angle - 90;
+
+/**
+ * 
+ * @param e object containing clientX and clientY poistion
+ * @param ctx Canvas Rendering 2D context
+ * @param offsetByScale Boolean value to use scale offset when checking for isPointInPath or isPointInStroke, for placing items in the canvas leave this as false
+ * @returns array with x and y coordinates
+ */
+export const getCanvasPoint = (e: { clientX: number, clientY: number }, ctx?: CanvasRenderingContext2D, offsetByScale?: boolean): [number, number] => {
+  if (ctx?.canvas == null) throw new Error('Canvas argument is undefined');
+  const { left, top } = ctx.canvas.getBoundingClientRect();
+  let scale = offsetByScale ? Math.ceil(window.devicePixelRatio) : 1;
   return [
-    e.clientX - left,
-    e.clientY - top
+    (e.clientX - left) * scale,
+    (e.clientY - top) * scale
   ];
 };
 
@@ -76,12 +87,14 @@ export const getConnectionPoints = (nodeA: CanvasNode, nodeB: CanvasNode, gap: n
   const nodeBConnection = findClosestPoint(nodeBPoints, midPoint);
   return { nodeA: nodeAConnection, nodeB: nodeBConnection };
 };
+
 export enum NodeSection {
-  oneFourth = 1.5,
+  oneFourth = 2.5,
   half = 2,
   threeFourth = 1.5,
   full = 1
 }
+
 export type nodeArcAutoPositionProps = {
   center: Point,
   centerRadius: number,
@@ -91,6 +104,7 @@ export type nodeArcAutoPositionProps = {
   gap: number,
   section: NodeSection
 }
+
 /**
  * Given point, a node radius size and node amount, it will return a method to that generates a nodes in a circle
  */
@@ -101,18 +115,13 @@ export const nodeArcAutoPosition = ({ center, centerRadius, nodesRadius, nodesCo
   const diameterOfEachNode = nodesRadius * 2 + gap;
   const neededCircumference = diameterOfEachNode * nodesSectionCount;
   const lvlRadius = (neededCircumference / (2 * Math.PI)) * 1.3;
-  const offsetAngle = startAngle - 90;
+  const offsetAngle = translateAngle(startAngle);
   const levelRadius = centerRadius + lvlRadius; //
   const placementRadius = (lvlRadius / 1.3) + centerRadius;
-
-  let sectionCircumference = neededCircumference;
-  if (section != NodeSection.full) {
-    sectionCircumference = ((0.5 * Math.PI) / (2 * Math.PI)) * neededCircumference;
-  }
   const angleStep = (diameterOfEachNode / neededCircumference) * 360;
 
   function positionNode(index: number): Point {
-    const radiansAngle = (index * angleStep + offsetAngle) * (Math.PI / 180)
+    const radiansAngle = (index * angleStep + offsetAngle) * (Math.PI / 180);
     const x = Math.cos(radiansAngle) * placementRadius + center.x;
     const y = Math.sin(radiansAngle) * placementRadius + center.y;
     return { x, y };

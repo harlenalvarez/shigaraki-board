@@ -1,6 +1,6 @@
 
 import { useCanvasCtx } from '@/store';
-import { getClickedPoint } from '@/utils';
+import { getCanvasPoint } from '@/utils';
 import React from 'react';
 import { ActionListenerContainer } from '../Main.styled';
 
@@ -13,7 +13,7 @@ export const DivHandler = () => {
     e.stopPropagation();
     ctx.resetTransform();
     ctx.beginPath();
-    const [currentX, currentY] = getClickedPoint(e, ctx.canvas);
+    const [currentX, currentY] = getCanvasPoint(e, ctx);
     const pattern = ctx.createLinearGradient(currentX, currentY, currentX + 240, currentY + 10);
     const selectedColor = 'blue';
     pattern.addColorStop(0, 'blue');
