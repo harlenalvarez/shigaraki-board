@@ -133,7 +133,7 @@ export const fromAlpaToHex = (alpa: number) => {
   const percentage = alpa * 100;
   const decimalValue = Math.round((percentage * 255) / 100);
   return decimalValue.toString(16);
-}
+};
 
 // 90/360 = x/circumference
 // .5PI/2PI = x/circum
