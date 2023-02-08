@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 import { ActionListenerContainer } from '../Main.styled';
 
 function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void, drawText: () => void, hover: boolean): void {
-
   const time = performance.now();
   clearCanvas(ctx);
 
@@ -38,16 +37,14 @@ function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void,
 
         if (!slope) {
           ctx.lineTo(nodeB.point.x, nodeB.point.y);
-        }
-        else if (nodeA.position & (CanvasNodeConnPosition.top | CanvasNodeConnPosition.bottom)) {
+        } else if (nodeA.position & (CanvasNodeConnPosition.top | CanvasNodeConnPosition.bottom)) {
           if (slope > -0.2 && slope < 0.2) {
             radius = 3;
           }
           ctx.arcTo(nodeA.point.x, midPoint.y, midPoint.x, midPoint.y, radius);
           ctx.arcTo(nodeB.point.x, midPoint.y, nodeB.point.x, nodeB.point.y, radius);
           ctx.lineTo(nodeB.point.x, nodeB.point.y);
-        }
-        else {
+        } else {
           if (slope > -0.2 && slope < 0.2) {
             //   ctx.quadraticCurveTo(midPoint.x, nodeA.point.y, midPoint.x, midPoint.y);
             //   ctx.quadraticCurveTo(midPoint.x, nodeB.point.y, nodeB.point.x, nodeB.point.y);
@@ -65,7 +62,6 @@ function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void,
         ctx.lineWidth = 2;
         ctx.stroke();
         ctx.beginPath();
-
       }
     }
   }
@@ -80,14 +76,13 @@ function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void,
     }
 
     if (isType<Node2D>(prevBeforeAdd, 'point', 'radius', 'text') && isType<Node2D>(prev, 'point', 'radius', 'text')) {
-      if (isNaN(Number(prev.text)) || Number(prev.text) % 2 > 0 && hover) continue;
+      if ((isNaN(Number(prev.text)) || Number(prev.text) % 2 > 0) && hover) continue;
       const { nodeA, nodeB } = getConnectionPoints(prevBeforeAdd, prev, 10);
       const midPoint = getMidPoint(nodeA.point, nodeB.point);
       ctx.beginPath();
       ctx.moveTo(nodeA.point.x, nodeA.point.y);
 
       // filter by evens
-
 
       // we want to move toward the midPoint with a quadratic curve
       // if bottom or top start with nodes
@@ -96,16 +91,14 @@ function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void,
 
       if (!slope) {
         ctx.lineTo(nodeB.point.x, nodeB.point.y);
-      }
-      else if (nodeA.position & (CanvasNodeConnPosition.top | CanvasNodeConnPosition.bottom)) {
+      } else if (nodeA.position & (CanvasNodeConnPosition.top | CanvasNodeConnPosition.bottom)) {
         if (slope > -0.2 && slope < 0.2) {
           radius = 3;
         }
         ctx.arcTo(nodeA.point.x, midPoint.y, midPoint.x, midPoint.y, radius);
         ctx.arcTo(nodeB.point.x, midPoint.y, nodeB.point.x, nodeB.point.y, radius);
         ctx.lineTo(nodeB.point.x, nodeB.point.y);
-      }
-      else {
+      } else {
         if (slope > -0.2 && slope < 0.2) {
           //   ctx.quadraticCurveTo(midPoint.x, nodeA.point.y, midPoint.x, midPoint.y);
           //   ctx.quadraticCurveTo(midPoint.x, nodeB.point.y, nodeB.point.x, nodeB.point.y);
@@ -137,17 +130,16 @@ export const SphereHandler = () => {
   const renderedText = new RenderedObjects();
   const [drawCanvas] = useRenderedObjectsDraw(renderedObjectsIntance);
   const [drawText] = useRenderedObjectsDraw(renderedText);
-  const [hoveringNode, setHoveringNode] = useState<ShapesBase>({} as ShapesBase)
+  const [hoveringNode, setHoveringNode] = useState<ShapesBase>({} as ShapesBase);
 
   useEffect(() => {
     if (!ctx) return;
     if (isType<Node2D>(hoveringNode, 'radius', 'point')) {
       connectAndRender(ctx, drawCanvas, drawText, true);
-    }
-    else {
+    } else {
       connectAndRender(ctx, drawCanvas, drawText, false);
     }
-  }, [hoveringNode, ctx])
+  }, [hoveringNode, ctx]);
   const handleClick = (e: React.MouseEvent) => {
     if (ctx == null) return;
     ctx.lineCap = 'round';
@@ -182,10 +174,8 @@ export const SphereHandler = () => {
     if (!isType<Node2D>(renderedObjectsIntance.head.value, 'radius', 'point')) return;
     const [x, y] = getCanvasPoint(e, ctx, true);
     if (ctx.isPointInPath(renderedObjectsIntance.head.value.path, x, y)) {
-      if (hoveringNode !== renderedObjectsIntance.head.value)
-        setHoveringNode(renderedObjectsIntance.head.value)
-    }
-    else if (isType<Node2D>(hoveringNode, 'radius', 'point')) {
+      if (hoveringNode !== renderedObjectsIntance.head.value) { setHoveringNode(renderedObjectsIntance.head.value); }
+    } else if (isType<Node2D>(hoveringNode, 'radius', 'point')) {
       setHoveringNode({} as ShapesBase);
     }
   };

@@ -46,7 +46,7 @@ export class ShapesBase {
     }
   }
 
-  private _strokeWidth?: number;
+  private readonly _strokeWidth?: number;
   get strokeWidth(): number | undefined {
     return this._strokeWidth;
   }

@@ -5,7 +5,7 @@ export type Point = {
 
 export type CanvasNode = {
   point: Point
-  radius: number,
+  radius: number
 };
 
 export enum CanvasNodeConnPosition {

@@ -15,7 +15,7 @@ describe('Cavnas Utilities', () => {
     };
     const mockContext: Partial<CanvasRenderingContext2D> = {
       canvas: mockCanvas as HTMLCanvasElement
-    }
+    };
     const [x, y] = getCanvasPoint(event, mockContext as CanvasRenderingContext2D);
     expect(x).toBe(1);
     expect(y).toBe(1);
@@ -28,7 +28,7 @@ describe('Cavnas Utilities', () => {
     };
     const mockContext: Partial<CanvasRenderingContext2D> = {
       canvas: mockCanvas as HTMLCanvasElement
-    }
+    };
     const [x, y] = getCanvasPoint(event, mockContext as CanvasRenderingContext2D) ?? [-1, -1];
     expect(x).toBe(1);
     expect(y).toBe(3);

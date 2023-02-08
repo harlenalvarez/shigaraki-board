@@ -1,11 +1,10 @@
 import { CanvasNode, Optional, Point } from '@/types';
 import { CanvasNodeConnections, CanvasNodeConnPosition } from '@/types/Shapes';
 
-
 export const translateAngle = (angle: number) => angle - 90;
 
 /**
- * 
+ *
  * @param e object containing clientX and clientY poistion
  * @param ctx Canvas Rendering 2D context
  * @param offsetByScale Boolean value to use scale offset when checking for isPointInPath or isPointInStroke, for placing items in the canvas leave this as false
@@ -14,7 +13,7 @@ export const translateAngle = (angle: number) => angle - 90;
 export const getCanvasPoint = (e: { clientX: number, clientY: number }, ctx?: CanvasRenderingContext2D, offsetByScale?: boolean): [number, number] => {
   if (ctx?.canvas == null) throw new Error('Canvas argument is undefined');
   const { left, top } = ctx.canvas.getBoundingClientRect();
-  let scale = offsetByScale ? Math.ceil(window.devicePixelRatio) : 1;
+  const scale = offsetByScale ? Math.ceil(window.devicePixelRatio) : 1;
   return [
     (e.clientX - left) * scale,
     (e.clientY - top) * scale
@@ -48,7 +47,7 @@ export const getDistance = (point1: Point, point2: Point): number => {
 // so I figure it will be less intensive to simply get the points by just using the radius with a gap
 export const getNodeAttachentPoints = (point: Point, radius: number, gap: number = 0): Point[] => {
   const gapRadius = radius + gap;
-  //const top = { x: point.x + gapRadius * Math.cos(Math.PI * 1.5), y: point.y + gapRadius * Math.sin(Math.PI * 1.5) };
+  // const top = { x: point.x + gapRadius * Math.cos(Math.PI * 1.5), y: point.y + gapRadius * Math.sin(Math.PI * 1.5) };
   const top = { x: point.x, y: point.y - gapRadius };
   const right = { x: point.x + gapRadius, y: point.y };
   const bottom = { x: point.x, y: point.y + gapRadius };
@@ -96,14 +95,14 @@ export enum NodeSection {
 }
 
 export type nodeArcAutoPositionProps = {
-  center: Point,
-  centerRadius: number,
-  nodesRadius: number,
-  nodesCount: number,
-  startAngle: number,
-  gap: number,
+  center: Point
+  centerRadius: number
+  nodesRadius: number
+  nodesCount: number
+  startAngle: number
+  gap: number
   section: NodeSection
-}
+};
 
 /**
  * Given point, a node radius size and node amount, it will return a method to that generates a nodes in a circle
@@ -126,9 +125,8 @@ export const nodeArcAutoPosition = ({ center, centerRadius, nodesRadius, nodesCo
     const y = Math.sin(radiansAngle) * placementRadius + center.y;
     return { x, y };
   }
-  return { levelRadius, placementRadius, positionNode }
-}
-
+  return { levelRadius, placementRadius, positionNode };
+};
 
 // 90/360 = x/circumference
 // .5PI/2PI = x/circum

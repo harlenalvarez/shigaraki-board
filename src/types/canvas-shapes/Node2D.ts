@@ -10,15 +10,16 @@ export class Node2D extends ShapesBase implements Serializable {
   path: Path2D;
   text?: string;
   progress?: number;
-  private progressPath?: Path2D;
-  private _text?: Text2D;
+  private readonly progressPath?: Path2D;
+  private readonly _text?: Text2D;
   get fontColor(): string {
     return this._text?.color ?? '';
   }
+
   set fontColor(value: string) {
-    if (this._text)
-      this._text.color = value;
+    if (this._text) { this._text.color = value; }
   }
+
   constructor(props: Need<Node2D, 'radius' | 'point'>) {
     super(props);
     this.radius = props.radius;
@@ -29,7 +30,7 @@ export class Node2D extends ShapesBase implements Serializable {
 
     if (props.text) {
       this.text = props.text;
-      this._text = new Text2D({ value: props.text, point: this.point, alignment: 'center', baseline: 'middle' })
+      this._text = new Text2D({ value: props.text, point: this.point, alignment: 'center', baseline: 'middle' });
     }
     this.fontColor = props.fontColor ?? '';
     if (props.progress) {
@@ -101,19 +102,18 @@ export class Node2D extends ShapesBase implements Serializable {
         onplan: '#77B10B',
         medium: '#FB810F',
         risk: '#D93630'
-      }
+      };
       ctx.strokeStyle = this.progress < 26 ? colors.risk : this.progress < 51 ? colors.medium : this.progress < 76 ? colors.onplan : colors.above;
       if (this.rgbaColor && this.rgbaColor[3] < 1) {
-        console.log('HERE')
+        console.log('HERE');
         const percentage = this.rgbaColor[3] * 100;
         const decimalValue = Math.round((percentage * 255) / 100);
-        console.log(decimalValue.toString(16))
+        console.log(decimalValue.toString(16));
         ctx.strokeStyle += decimalValue.toString(16);
       }
       ctx.stroke(this.progressPath);
     }
   }
 }
-
 
 // 100/2PI = P/x = (100x) = (P*2PI)/100 = x
