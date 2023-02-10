@@ -93,7 +93,10 @@ export enum NodeSection {
   threeFourth = 1.5,
   full = 1
 }
-
+export enum EdgeConnectionType {
+  straight = 0b1,
+  curved = 0b10
+}
 export type nodeArcAutoPositionProps = {
   center: Point
   centerRadius: number
@@ -107,25 +110,27 @@ export type nodeArcAutoPositionProps = {
 /**
  * Given point, a node radius size and node amount, it will return a method to that generates a nodes in a circle
  */
-export const nodeArcAutoPosition = ({ center, centerRadius, nodesRadius, nodesCount, startAngle = 0, gap = 10, section = NodeSection.full }: Optional<nodeArcAutoPositionProps, 'startAngle' | 'gap' | 'section'>) => {
+export const nodeArcAutoPosition = ({ center, centerRadius, nodesRadius, nodesCount, startAngle = 0, gap = 10, section = NodeSection.full }: Optional<nodeArcAutoPositionProps, 'startAngle' | 'gap' | 'section'>): [(index: number) => Point, number, number] => {
   const nodesSectionCount = nodesCount * section;
   if (nodesSectionCount < 1) { throw new Error('Node Arc Auto Poisition did not recieved a node count'); }
 
   const diameterOfEachNode = nodesRadius * 2 + gap;
   const neededCircumference = diameterOfEachNode * nodesSectionCount;
-  const lvlRadius = (neededCircumference / (2 * Math.PI)) * 1.3;
+  const radiusGap = Math.max(30, gap + 20);
+  const nodeRadius = centerRadius + nodesRadius + radiusGap;
+  console.log('center and diameter or circumferende', nodeRadius, (neededCircumference / (2 * Math.PI)))
+  const lvlRadius = Math.max(nodeRadius, (neededCircumference / (2 * Math.PI)));
   const offsetAngle = translateAngle(startAngle);
-  const levelRadius = centerRadius + lvlRadius; //
-  const placementRadius = (lvlRadius / 1.3) + centerRadius;
+  const levelRadius = centerRadius + lvlRadius;
   const angleStep = (diameterOfEachNode / neededCircumference) * 360;
 
   function positionNode(index: number): Point {
     const radiansAngle = (index * angleStep + offsetAngle) * (Math.PI / 180);
-    const x = Math.cos(radiansAngle) * placementRadius + center.x;
-    const y = Math.sin(radiansAngle) * placementRadius + center.y;
+    const x = Math.cos(radiansAngle) * levelRadius + center.x;
+    const y = Math.sin(radiansAngle) * levelRadius + center.y;
     return { x, y };
   }
-  return { levelRadius, placementRadius, positionNode };
+  return [positionNode, levelRadius, nodeRadius];
 };
 
 export const fromAlpaToHex = (alpa: number) => {
