@@ -21,9 +21,9 @@
 	min-height: 100vh;
 	min-width: 100vh;
 	background: var(--bg-color);
-	background-image: radial-gradient(var(--dot-color) 5%, transparent 0);
-	background-size: 2% 2%;
-	background-position: -1% -1%;
+	background-image: radial-gradient(circle at center, var(--dot-color) 7%, transparent 0);
+	background-size: 20px 20px;
+	background-position: -1px -1px;
 }
 
 .hidden {

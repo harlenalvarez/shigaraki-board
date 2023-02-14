@@ -19,7 +19,7 @@ export const Container = () => {
     return () => {
       document.removeEventListener('scroll', keepInView);
     };
-  }, []);
+  }, [mainRef, keepInView]);
   return (
     <>
       <section id='main' className={styles.main} tabIndex={1} ref={mainRef}>
