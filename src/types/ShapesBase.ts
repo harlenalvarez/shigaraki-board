@@ -1,7 +1,7 @@
 import { styleColors } from '@/store';
+import { Point } from '@practicaljs/canvas-kit';
 import { RGBA } from './DrawContext';
 import { Need } from './reducer';
-import { Point } from './Shapes';
 
 export abstract class Serializable {
   abstract toByteArray: () => Uint8Array;
