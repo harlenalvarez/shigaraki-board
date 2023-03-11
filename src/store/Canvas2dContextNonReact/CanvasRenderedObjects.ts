@@ -3,9 +3,9 @@ import { findShape } from '@/utils';
 
 let subscribers: Array<() => void> = [];
 const notify = () => {
-  console.log('Changes ', subscribers.length)
-  subscribers.forEach(s => { s() })
-}
+  console.log('Changes ', subscribers.length);
+  subscribers.forEach(s => { s(); });
+};
 
 class RenderedObject<T> {
   next: RenderedObject<T> | null;
@@ -34,7 +34,7 @@ export class RenderedObjects {
     } else {
       this._length = 0;
     }
-    this.getSnapshot = this.getSnapshot.bind(this)
+    this.getSnapshot = this.getSnapshot.bind(this);
   }
 
   push(value: ShapesBase) {
@@ -122,9 +122,9 @@ export class RenderedObjects {
 
   fromByteArray(nodes: ArrayBufferLike[] | Uint8Array[]) {
     if (nodes[0] instanceof ArrayBuffer) {
-      return this.fromUint8ByteArray(nodes.map(node => new Uint8Array(node)));
+      this.fromUint8ByteArray(nodes.map(node => new Uint8Array(node)));
     } else {
-      return this.fromUint8ByteArray(nodes as Uint8Array[]);
+      this.fromUint8ByteArray(nodes as Uint8Array[]);
     }
   }
 
@@ -147,22 +147,21 @@ export class RenderedObjects {
     }
   }
 
-  // react specific 
+  // react specific
   subscribe = (onStoreChange: () => void) => {
-    subscribers = [...subscribers, onStoreChange]
-    console.log('Added subscriber')
+    subscribers = [...subscribers, onStoreChange];
+    console.log('Added subscriber');
     return () => {
-      console.log('About to Remove sub', subscribers.length)
-      subscribers = subscribers.filter(s => s !== onStoreChange)
-      console.log('Removed sub', subscribers.length)
-    }
-  }
+      console.log('About to Remove sub', subscribers.length);
+      subscribers = subscribers.filter(s => s !== onStoreChange);
+      console.log('Removed sub', subscribers.length);
+    };
+  };
 
   getSnapshot() {
-    console.log('GEtting length')
+    console.log('GEtting length');
     return this.length;
   }
-
 }
 
 export const renderedObjects = new RenderedObjects();
