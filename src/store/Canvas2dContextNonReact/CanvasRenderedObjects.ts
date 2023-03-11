@@ -1,4 +1,4 @@
-import { Box2D, isType, Serializable, ShapesBase, ShapeTypes, Text2D } from '@/types';
+import { Box2D, isType, type Serializable, type ShapesBase, ShapeTypes, Text2D } from '@/types';
 import { findShape } from '@/utils';
 
 let subscribers: Array<() => void> = [];
@@ -91,7 +91,7 @@ export class RenderedObjects {
     return this.remove(this.head);
   }
 
-  *[Symbol.iterator]() {
+  * [Symbol.iterator]() {
     let curr = this.head;
     while (curr != null) {
       yield curr;

@@ -1,7 +1,7 @@
 import { ScaleContext } from '@/components/Zoom';
 import { useRenderedObjectsDraw } from '@/hooks/useRenderedObjectsDraw';
 import { RenderedObjects, renderedObjectsIntance, useCanvasCtx } from '@/store';
-import { isType, ShapesBase } from '@/types';
+import { isType, type ShapesBase } from '@/types';
 import { Node2D } from '@/types/canvas-shapes/Node2D';
 import { clearCanvas, connectNodesWithCurvedLine, connectNodesWithStraightLine, EdgeConnectionType, getCanvasPoint, getNodeAttachentPoints, nodeRadialPosition, NodeSection } from '@practicaljs/canvas-kit';
 import { useEventSubscriber } from '@practicaljs/react-eventchannel';

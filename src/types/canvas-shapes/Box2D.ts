@@ -1,6 +1,6 @@
 import { RenderedObjects } from '@/store';
 import { hasMagicNumber } from '@/utils';
-import { Need } from '@practicaljs/canvas-kit';
+import { type Need } from '@practicaljs/canvas-kit';
 import { ShapesBase, type Serializable } from '../ShapesBase';
 import { MagicNumbers } from './ShapesService';
 

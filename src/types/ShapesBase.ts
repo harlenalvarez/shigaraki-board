@@ -2,15 +2,14 @@ import { styleColors } from '@/store';
 import { type Need, type Point } from '@practicaljs/canvas-kit';
 import { type RGBA } from './DrawContext';
 
-export abstract class Serializable {
-  abstract toByteArray: () => Uint8Array;
-  static fromByteArray: (payload: Uint8Array) => unknown;
-  static magicNumber: () => Uint8Array;
-  static byteArrayIsTypeOf: (payload: Uint8Array) => boolean;
-  abstract setScale: (scale: number) => void;
+export interface Serializable {
+  toByteArray: () => Uint8Array;
+  fromByteArray: (payload: Uint8Array) => unknown;
+  byteArrayIsTypeOf: (payload: Uint8Array) => boolean;
+  setScale: (scale: number) => void;
 }
 
-export class ShapesBase {
+export abstract class ShapesBase {
   encoder: TextEncoder = new TextEncoder();
   static decoder: TextDecoder = new TextDecoder();
   point: Point;
