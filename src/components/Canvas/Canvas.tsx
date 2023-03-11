@@ -5,9 +5,7 @@ import { useCallback, useLayoutEffect, useRef } from 'react';
 export const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const setCtx = useSetCanvasCtx();
-  const [redraw] = useEventProducer({ eventName: 'onRedraw' })
-
-
+  const [redraw] = useEventProducer({ eventName: 'onRedraw' });
 
   useLayoutEffect(() => {
     handleSetCurrentHeight();
@@ -27,9 +25,7 @@ export const Canvas = () => {
     canvasRef.current.style.width = `${width}px`;
     canvasRef.current.style.height = `${height}px`;
 
-
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
 
     setCtx(ctx);
     redraw();

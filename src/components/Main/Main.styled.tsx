@@ -16,5 +16,4 @@ export const MainContainer = styled('div')`
   ". . login"
   "menu . com"
   ". . settings";
-`
-
+`;

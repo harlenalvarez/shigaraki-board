@@ -1,4 +1,4 @@
-import { RenderedObjects, useCanvasCtx } from '@/store';
+import { type RenderedObjects, useCanvasCtx } from '@/store';
 
 export const useRenderedObjectsDraw = (objects: RenderedObjects) => {
   const ctx = useCanvasCtx();

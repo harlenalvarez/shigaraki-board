@@ -5,7 +5,7 @@ import { Zoom } from './Zoom';
 
 // container is composed of 3 sections, main action buttons, popover actions and canvas
 export const Container = () => {
-  console.log('rendeing container')
+  console.log('rendeing container');
   return (
     <>
       <Zoom>

@@ -1,4 +1,4 @@
-import { Action, ReducerActions, RGBA, ShapeTypeKeys } from '@/types';
+import { type Action, type ReducerActions, type RGBA, type ShapeTypeKeys } from '@/types';
 
 export type MenuSelectionContext = {
   selectedOption: ShapeTypeKeys

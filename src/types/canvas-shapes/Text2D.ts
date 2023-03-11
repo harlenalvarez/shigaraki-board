@@ -1,7 +1,7 @@
 import { styleColors } from '@/store';
 import { hasMagicNumber } from '@/utils';
-import { Need } from '../reducer';
-import { Serializable, ShapesBase } from '../ShapesBase';
+import { Need } from '@practicaljs/canvas-kit';
+import { ShapesBase, type Serializable } from '../ShapesBase';
 import { MagicNumbers } from './ShapesService';
 
 export class Text2D extends ShapesBase implements Serializable {

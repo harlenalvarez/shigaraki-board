@@ -1,7 +1,6 @@
 import { hasMagicNumber } from '@/utils';
-import { fromAlpaToHex, Point, translateAngle } from '@practicaljs/canvas-kit';
-import { Need } from '../reducer';
-import { Serializable, ShapesBase } from '../ShapesBase';
+import { fromAlpaToHex, Need, translateAngle, type Point } from '@practicaljs/canvas-kit';
+import { ShapesBase, type Serializable } from '../ShapesBase';
 import { MagicNumbers } from './ShapesService';
 import { Text2D } from './Text2D';
 

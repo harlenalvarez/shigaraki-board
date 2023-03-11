@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-
-export const ScaleContext = React.createContext(1)
+export const ScaleContext = React.createContext(1);
 
 export const Zoom = (props: { children: React.ReactNode }) => {
   const onMac = useMemo(() => window.navigator.userAgent.toLowerCase().includes('mac'), []);
@@ -12,30 +11,27 @@ export const Zoom = (props: { children: React.ReactNode }) => {
     if (e.key === 'Control' || (onMac && e.key === 'Meta')) {
       window.addEventListener('keypress', handleZoomPress);
       window.addEventListener('keyup', checkStopZoom);
-    }
-    else if (e.key === '-') {
+    } else if (e.key === '-') {
+      e.preventDefault();
+    } else if (e.key === '=') {
       e.preventDefault();
     }
-    else if (e.key === '=') {
-      e.preventDefault();
-    }
-  }
+  };
 
   const handleZoomPress = (e: KeyboardEvent) => {
     if (e.key === '-') {
       e.preventDefault();
-    }
-    else if (e.key === '=') {
+    } else if (e.key === '=') {
       e.preventDefault();
     }
-  }
+  };
 
   const checkStopZoom = (e: KeyboardEvent) => {
     if (e.key === 'Control' || (onMac && e.key === 'Meta')) {
       window.removeEventListener('keyup', checkStopZoom);
       window.removeEventListener('keypress', handleZoomPress);
     }
-  }
+  };
 
   const handlePinchZoom = (e: WheelEvent) => {
     if (e.ctrlKey) {
@@ -48,7 +44,7 @@ export const Zoom = (props: { children: React.ReactNode }) => {
         return currentScale;
       });
     }
-  }
+  };
 
   useEffect(() => {
     window.addEventListener('keydown', handleZoomClick);
@@ -57,12 +53,12 @@ export const Zoom = (props: { children: React.ReactNode }) => {
     return () => {
       window.removeEventListener('keydown', handleZoomClick);
       document.body.removeEventListener('wheel', handlePinchZoom);
-    }
+    };
   }, []);
 
   return (
     <ScaleContext.Provider value={scale}>
       {props.children}
     </ScaleContext.Provider>
-  )
-}
+  );
+};

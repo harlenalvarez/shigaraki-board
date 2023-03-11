@@ -11,7 +11,7 @@ const MainActions = () => {
 };
 
 export const Main = () => {
-  console.log('Rendering main')
+  console.log('Rendering main');
   // const length = useSyncExternalStore(renderedObjectsIntance.subscribe, renderedObjectsIntance.getSnapshot)
   // const [draw] = useRenderedObjectsDraw(renderedObjectsIntance)
 

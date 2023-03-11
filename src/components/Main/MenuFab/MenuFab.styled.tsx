@@ -8,9 +8,9 @@ export const ButtonGroup = styled(MuiButtonGroup)`
   background-color: white;
   overflow: hidden;
   width: 65px;
-`
+`;
 
 export const IconButton = styled(MuiIconButton)`
   border-radius: 0;
   background-color: ${props => props['aria-selected'] ? styleColors.mainColor : 'white'};
-`
+`;

@@ -1,14 +1,13 @@
 import { styleColors } from '@/store';
-import { Point } from '@practicaljs/canvas-kit';
-import { RGBA } from './DrawContext';
-import { Need } from './reducer';
+import { type Need, type Point } from '@practicaljs/canvas-kit';
+import { type RGBA } from './DrawContext';
 
 export abstract class Serializable {
   abstract toByteArray: () => Uint8Array;
   static fromByteArray: (payload: Uint8Array) => unknown;
   static magicNumber: () => Uint8Array;
   static byteArrayIsTypeOf: (payload: Uint8Array) => boolean;
-  abstract setScale: (scale: number) => void
+  abstract setScale: (scale: number) => void;
 }
 
 export class ShapesBase {
@@ -50,7 +49,7 @@ export class ShapesBase {
 
   private readonly _strokeWidth?: number;
   get strokeWidth(): number | undefined {
-    if (this._strokeWidth == null) return this._strokeWidth
+    if (this._strokeWidth == null) return this._strokeWidth;
     return this._strokeWidth * this.scale;
   }
 

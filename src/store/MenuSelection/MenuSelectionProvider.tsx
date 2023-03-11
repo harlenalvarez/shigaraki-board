@@ -1,4 +1,4 @@
-import { ActionDispatchType, createActions, createReducer } from '@/types';
+import { type ActionDispatchType, createActions, createReducer } from '@/types';
 import { createContext, useContext, useReducer } from 'react';
 import { menuSelectionActions, menuSelectionInitialState } from './MenuSelectionContext';
 

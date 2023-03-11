@@ -1,4 +1,4 @@
-import { ShapeTypeKeys } from '@/types';
+import { type ShapeTypeKeys } from '@/types';
 import { DivHandler } from './DivHandler';
 import { LineHandler } from './LineHandler';
 import { SphereHandler } from './SphereHandler';

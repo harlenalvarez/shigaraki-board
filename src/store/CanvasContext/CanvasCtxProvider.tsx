@@ -11,8 +11,8 @@ export const CanvasCtxProvider = ({ children }: CanvasCtxProviderProps) => {
   const [ctx, setCtx] = useState<CanvasRenderingContext2D | null | undefined>(null);
 
   const handleSet = (ctx: React.SetStateAction<CanvasRenderingContext2D | null | undefined>) => {
-    setCtx(ctx)
-  }
+    setCtx(ctx);
+  };
 
   return (
     <CanvasContext.Provider value={ctx}>
