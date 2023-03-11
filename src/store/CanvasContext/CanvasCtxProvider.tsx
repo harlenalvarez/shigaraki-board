@@ -9,12 +9,17 @@ export type CanvasCtxProviderProps = {
 
 export const CanvasCtxProvider = ({ children }: CanvasCtxProviderProps) => {
   const [ctx, setCtx] = useState<CanvasRenderingContext2D | null | undefined>(null);
+
+  const handleSet = (ctx: React.SetStateAction<CanvasRenderingContext2D | null | undefined>) => {
+    setCtx(ctx)
+  }
+
   return (
-    <SetCanvasContext.Provider value={setCtx}>
-      <CanvasContext.Provider value={ctx}>
+    <CanvasContext.Provider value={ctx}>
+      <SetCanvasContext.Provider value={handleSet}>
         {children}
-      </CanvasContext.Provider>
-    </SetCanvasContext.Provider>
+      </SetCanvasContext.Provider>
+    </CanvasContext.Provider>
   );
 };
 

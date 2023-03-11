@@ -1,6 +1,6 @@
-import { fromAlpaToHex, hasMagicNumber, translateAngle } from '@/utils';
+import { hasMagicNumber } from '@/utils';
+import { fromAlpaToHex, Point, translateAngle } from '@practicaljs/canvas-kit';
 import { Need } from '../reducer';
-import { Point } from '../Shapes';
 import { Serializable, ShapesBase } from '../ShapesBase';
 import { MagicNumbers } from './ShapesService';
 import { Text2D } from './Text2D';
@@ -11,7 +11,7 @@ export class Node2D extends ShapesBase implements Serializable {
   text?: string;
   progress?: number;
   private readonly progressPath?: Path2D;
-  private readonly _text?: Text2D;
+  private _text?: Text2D;
   get fontColor(): string {
     return this._text?.color ?? '';
   }
@@ -112,6 +112,16 @@ export class Node2D extends ShapesBase implements Serializable {
       }
       ctx.stroke(this.progressPath);
     }
+  }
+
+  setScale(scale: number) {
+    this.scale = scale;
+    if (this.text) {
+      this._text = new Text2D({ value: this.text, point: this.point, alignment: 'center', baseline: 'middle', scale });
+    }
+
+    this.path = new Path2D();
+    this.path.arc(this.point.x, this.point.y, this.radius * scale, 0, 2 * Math.PI);
   }
 }
 

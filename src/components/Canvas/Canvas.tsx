@@ -1,51 +1,43 @@
 import { useSetCanvasCtx } from '@/store';
+import { useEventProducer } from '@practicaljs/react-eventchannel';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 
 export const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const setCtx = useSetCanvasCtx();
+  const [redraw] = useEventProducer({ eventName: 'onRedraw' })
+
+
 
   useLayoutEffect(() => {
     handleSetCurrentHeight();
     // handleStyledSize();
   }, []);
 
-  const handleSetCurrentHeight = useCallback(() => {
-    if (canvasRef.current == null) return;
+  const handleSetCurrentHeight = useCallback((e?: { clientX: number, clientY: number }) => {
+    if (!canvasRef.current) return;
     const ctx = canvasRef.current.getContext('2d');
-    if (ctx == null) return;
+    if (!ctx) return;
+
     const ratio = Math.ceil(window.devicePixelRatio);
     const height = Math.max(window.innerHeight, 1600);
     const width = Math.max(window.innerWidth, 1600);
-    const data = ctx.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
     canvasRef.current.height = height * ratio;
     canvasRef.current.width = width * ratio;
-
     canvasRef.current.style.width = `${width}px`;
     canvasRef.current.style.height = `${height}px`;
-    ctx.scale(ratio, ratio);
-    ctx.putImageData(data, 0, 0);
+
+
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+
     setCtx(ctx);
+    redraw();
   }, []);
-
-  // const handleStyledSize = useCallback(() => {
-  //   if (canvasRef.current == null) return;
-  //   canvasRef.current.style.height = `${window.innerHeight}px`;
-  //   canvasRef.current.style.width = `${window.innerWidth}px`;
-  // }, []);
-
-  // useEffect(() => {
-  //   const ctx = canvasRef.current?.getContext('2d');
-
-  //   // window.addEventListener('resize', handleStyledSize);
-  //   // return () => {
-  //   //   window.removeEventListener('resize', handleStyledSize);
-  //   // };
-  // }, []);
 
   return (
     <>
-      <canvas ref={canvasRef} ></canvas>
+      <canvas ref={canvasRef}></canvas>
     </>
   );
 };

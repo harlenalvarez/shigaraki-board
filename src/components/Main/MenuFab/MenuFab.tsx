@@ -1,25 +1,12 @@
-import Divider from '@mui/material/Divider';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { Stack } from './MenuFab.styled';
-
+import { ReactComponent as SelectIcon } from '@/assets/cursor.svg';
+import { ButtonGroup, IconButton } from './MenuFab.styled';
 export const MenuFab = () => {
-  const stackRef = useRef<HTMLDivElement>(null);
-  const [currentHeight, setCurrentHeight] = useState('');
-
-  const handleSetCurrentHeight = useCallback(() => {
-    if (stackRef.current == null) return;
-
-    const { height } = stackRef.current.getBoundingClientRect();
-    setCurrentHeight(`${height}px`);
-  }, [stackRef]);
-
-  useLayoutEffect(() => {
-    handleSetCurrentHeight();
-  }, []);
 
   return (
-    <Stack ref={stackRef} currentheight={currentHeight} direction='column' divider={<Divider orientation="vertical" flexItem />}>
-      <div style={{ height: '80vh' }}>Button</div>
-    </Stack>
+    <ButtonGroup variant='contained' orientation='vertical' aria-label='Shapes Selection Menu'>
+      <IconButton aria-selected='true'>
+        <SelectIcon />
+      </IconButton>
+    </ButtonGroup>
   );
 };

@@ -1,4 +1,4 @@
-import { Colors } from '@/store';
+import { styleColors } from '@/store';
 import { hasMagicNumber } from '@/utils';
 import { Need } from '../reducer';
 import { Serializable, ShapesBase } from '../ShapesBase';
@@ -10,7 +10,7 @@ export class Text2D extends ShapesBase implements Serializable {
   alignment: 'start' | 'end' | 'left' | 'center' | 'right';
   baseline: 'top' | 'hanging' | 'middle' | 'alphabetic' | 'ideographic' | 'bottom';
 
-  constructor (props: Need<Text2D, 'value' | 'point'>) {
+  constructor(props: Need<Text2D, 'value' | 'point'>) {
     super(props);
     this.value = props.value;
     this.point = props.point;
@@ -18,12 +18,12 @@ export class Text2D extends ShapesBase implements Serializable {
     this.alignment = props.alignment ?? 'start';
     this.baseline = props.baseline ?? 'alphabetic';
 
-    this.color = props.color ?? Colors.TextDark;
+    this.color = props.color ?? styleColors.textDark;
     this.strokeColor = props.strokeColor;
     this.draw = this.draw.bind(this);
   }
 
-  draw (ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     ctx.restore();
     ctx.beginPath();
 
@@ -43,7 +43,7 @@ export class Text2D extends ShapesBase implements Serializable {
     }
   }
 
-  toByteArray () {
+  toByteArray() {
     const baseJson = this.toJson();
     const textJson = {
       ...baseJson,
@@ -62,14 +62,16 @@ export class Text2D extends ShapesBase implements Serializable {
     return magicPrefix;
   }
 
-  static fromByteArray (payload: Uint8Array) {
+  static fromByteArray(payload: Uint8Array) {
     if (!Text2D.byteArrayIsTypeOf(payload)) return null;
     const decodedPayload = ShapesBase.decoder.decode(payload.subarray(MagicNumbers.text.length));
     const textJson = JSON.parse(decodedPayload) as Text2D;
     return new Text2D(textJson);
   }
 
-  static byteArrayIsTypeOf (payload: Uint8Array) {
+  static byteArrayIsTypeOf(payload: Uint8Array) {
     return hasMagicNumber(payload, MagicNumbers.text);
   }
+
+  setScale(scale: number) { }
 }

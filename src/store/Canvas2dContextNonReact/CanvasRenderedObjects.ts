@@ -1,11 +1,17 @@
 import { Box2D, isType, Serializable, ShapesBase, ShapeTypes, Text2D } from '@/types';
 import { findShape } from '@/utils';
 
+let subscribers: Array<() => void> = [];
+const notify = () => {
+  console.log('Changes ', subscribers.length)
+  subscribers.forEach(s => { s() })
+}
+
 class RenderedObject<T> {
   next: RenderedObject<T> | null;
   value: T | null;
   prev: RenderedObject<T> | null;
-  constructor (value?: T) {
+  constructor(value?: T) {
     this.value = value ?? null;
     this.prev = null;
     this.next = null;
@@ -16,11 +22,11 @@ export class RenderedObjects {
   head: RenderedObject<ShapesBase> | null;
   tail: RenderedObject<ShapesBase> | null;
   private _length: number;
-  get length () {
+  get length() {
     return this._length;
   }
 
-  constructor (latest?: RenderedObject<ShapesBase>) {
+  constructor(latest?: RenderedObject<ShapesBase>) {
     this.head = latest ?? null;
     this.tail = null;
     if (this.head != null) {
@@ -28,9 +34,10 @@ export class RenderedObjects {
     } else {
       this._length = 0;
     }
+    this.getSnapshot = this.getSnapshot.bind(this)
   }
 
-  push (value: ShapesBase) {
+  push(value: ShapesBase) {
     this._length++;
     const node = new RenderedObject(value);
     if (this.head == null) {
@@ -52,9 +59,10 @@ export class RenderedObjects {
     this.tail.next = node;
     node.prev = this.tail;
     this.tail = node;
+    notify();
   }
 
-  remove (node: RenderedObject<ShapesBase> | null) {
+  remove(node: RenderedObject<ShapesBase> | null) {
     if (node == null) return null;
     this._length--;
 
@@ -67,20 +75,23 @@ export class RenderedObjects {
     if (node === this.head) {
       this.head = node.next;
     }
+    if (node) {
+      notify();
+    }
     return node ?? null;
   }
 
-  pop () {
+  pop() {
     if (this.tail == null) return this.remove(this.head);
     return this.remove(this.tail);
   }
 
-  dequeue () {
+  dequeue() {
     if (this.head == null) return this.remove(this.tail);
     return this.remove(this.head);
   }
 
-  * [Symbol.iterator] () {
+  *[Symbol.iterator]() {
     let curr = this.head;
     while (curr != null) {
       yield curr;
@@ -88,7 +99,7 @@ export class RenderedObjects {
     }
   }
 
-  clear () {
+  clear() {
     let current = this.head;
     while ((current?.next) != null) {
       current.value = null;
@@ -97,9 +108,10 @@ export class RenderedObjects {
     this.head = null;
     this.tail = null;
     this._length = 0;
+    notify();
   }
 
-  * toByteArray () {
+  * toByteArray() {
     for (const node of this) {
       if (node.value === null) continue;
       if (isType<Serializable>(node.value, 'toByteArray')) {
@@ -108,7 +120,7 @@ export class RenderedObjects {
     }
   }
 
-  fromByteArray (nodes: ArrayBufferLike[] | Uint8Array[]) {
+  fromByteArray(nodes: ArrayBufferLike[] | Uint8Array[]) {
     if (nodes[0] instanceof ArrayBuffer) {
       return this.fromUint8ByteArray(nodes.map(node => new Uint8Array(node)));
     } else {
@@ -116,14 +128,14 @@ export class RenderedObjects {
     }
   }
 
-  fromUint8ByteArray (nodes: Uint8Array[]) {
+  fromUint8ByteArray(nodes: Uint8Array[]) {
     for (const node of nodes) {
       const type = findShape(node.subarray(0, 5));
       this.parseAndPush(node, type);
     }
   }
 
-  parseAndPush (node: Uint8Array, nodeType: number) {
+  parseAndPush(node: Uint8Array, nodeType: number) {
     if (nodeType & ShapeTypes.box) {
       const textNode = Box2D.fromByteArray(node);
       if (textNode === null) throw new Error('Failed to parse');
@@ -134,6 +146,23 @@ export class RenderedObjects {
       this.push(boxNode);
     }
   }
+
+  // react specific 
+  subscribe = (onStoreChange: () => void) => {
+    subscribers = [...subscribers, onStoreChange]
+    console.log('Added subscriber')
+    return () => {
+      console.log('About to Remove sub', subscribers.length)
+      subscribers = subscribers.filter(s => s !== onStoreChange)
+      console.log('Removed sub', subscribers.length)
+    }
+  }
+
+  getSnapshot() {
+    console.log('GEtting length')
+    return this.length;
+  }
+
 }
 
 export const renderedObjects = new RenderedObjects();

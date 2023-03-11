@@ -1,4 +1,4 @@
-import { Colors } from '@/store';
+import { styleColors } from '@/store';
 import { RGBA } from './DrawContext';
 import { Need } from './reducer';
 import { Point } from './Shapes';
@@ -8,6 +8,7 @@ export abstract class Serializable {
   static fromByteArray: (payload: Uint8Array) => unknown;
   static magicNumber: () => Uint8Array;
   static byteArrayIsTypeOf: (payload: Uint8Array) => boolean;
+  abstract setScale: (scale: number) => void
 }
 
 export class ShapesBase {
@@ -16,6 +17,7 @@ export class ShapesBase {
   point: Point;
   private _color?: string;
   rgbaColor?: RGBA;
+  scale: number = 1;
   get color(): string {
     if (!this._color) {
       throw new Error('color not set');
@@ -48,7 +50,8 @@ export class ShapesBase {
 
   private readonly _strokeWidth?: number;
   get strokeWidth(): number | undefined {
-    return this._strokeWidth;
+    if (this._strokeWidth == null) return this._strokeWidth
+    return this._strokeWidth * this.scale;
   }
 
   set strokeWidth(value: number | undefined) {
@@ -57,7 +60,7 @@ export class ShapesBase {
 
   constructor(props: Need<ShapesBase, 'point'>) {
     this.point = props.point;
-    this.color = props.color ?? Colors.TextDark;
+    this.color = props.color ?? styleColors.textDark;
     this.strokeColor = props.strokeColor;
     this.toJson = this.toJson.bind(this);
   }

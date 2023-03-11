@@ -1,15 +1,16 @@
-import { styled } from '@mui/material/styles';
-import MuiStack from '@mui/system/Stack';
+import { styleColors } from '@/store';
+import MuiButtonGroup from '@mui/material/ButtonGroup';
+import MuiIconButton from '@mui/material/IconButton';
+import styled from '@mui/system/styled';
 
-type StackProps = {
-  currentheight: string
-};
+export const ButtonGroup = styled(MuiButtonGroup)`
+  grid-area: menu;
+  background-color: white;
+  overflow: hidden;
+  width: 65px;
+`
 
-export const Stack = styled(MuiStack)<StackProps>`
-  position: absolute;
-  top: calc((100vh - ${props => props.currentheight}) / 2);
-  left: 10px;
-  background-color: red;
-  border-radius: 4px;
-  z-index: 1;
-`;
+export const IconButton = styled(MuiIconButton)`
+  border-radius: 0;
+  background-color: ${props => props['aria-selected'] ? styleColors.mainColor : 'white'};
+`

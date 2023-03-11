@@ -1,47 +1,14 @@
+import { ScaleContext } from '@/components/Zoom';
 import { useRenderedObjectsDraw } from '@/hooks/useRenderedObjectsDraw';
 import { RenderedObjects, renderedObjectsIntance, useCanvasCtx } from '@/store';
 import { isType, ShapesBase } from '@/types';
 import { Node2D } from '@/types/canvas-shapes/Node2D';
-import { CanvasNodeConnPosition } from '@/types/Shapes';
-import { clearCanvas, EdgeConnectionType, getCanvasPoint, getConnectionPoints, getMidPoint, getSlope, nodeArcAutoPosition, NodeSection } from '@/utils';
-import { useEffect, useState } from 'react';
+import { clearCanvas, connectNodesWithCurvedLine, connectNodesWithStraightLine, EdgeConnectionType, getCanvasPoint, getNodeAttachentPoints, nodeRadialPosition, NodeSection } from '@practicaljs/canvas-kit';
+import { useEventSubscriber } from '@practicaljs/react-eventchannel';
+import { useContext, useEffect, useState } from 'react';
 import { ActionListenerContainer } from '../Main.styled';
 
 
-function connectWithCurvedLines(parent: Node2D, child: Node2D, ctx: CanvasRenderingContext2D) {
-  const { nodeA, nodeB } = getConnectionPoints(parent, child, 10);
-  const midPoint = getMidPoint(nodeA.point, nodeB.point);
-  ctx.beginPath();
-  ctx.moveTo(nodeA.point.x, nodeA.point.y);
-
-  // we want to move toward the midPoint with a quadratic curve
-  // if bottom or top start with nodes
-  let radius = 30;
-  const slope = getSlope(nodeA.point, nodeB.point, radius * 2);
-
-  if (!slope) {
-    ctx.lineTo(nodeB.point.x, nodeB.point.y);
-  } else if (nodeA.position & (CanvasNodeConnPosition.top | CanvasNodeConnPosition.bottom)) {
-    if (slope > -0.2 && slope < 0.2) {
-      radius = 3;
-    }
-    ctx.arcTo(nodeA.point.x, midPoint.y, midPoint.x, midPoint.y, radius);
-    ctx.arcTo(nodeB.point.x, midPoint.y, nodeB.point.x, nodeB.point.y, radius);
-    ctx.lineTo(nodeB.point.x, nodeB.point.y);
-  } else {
-    if (slope > -0.2 && slope < 0.2) {
-      radius = 3;
-    }
-    ctx.arcTo(midPoint.x, nodeA.point.y, midPoint.x, midPoint.y, radius);
-    ctx.arcTo(midPoint.x, nodeB.point.y, nodeB.point.x, nodeB.point.y, radius);
-    ctx.lineTo(nodeB.point.x, nodeB.point.y);
-  }
-}
-
-function connectWithStraightLines(parent: Node2D, child: Node2D, ctx: CanvasRenderingContext2D) {
-  ctx.moveTo(parent.point.x, parent.point.y);
-  ctx.lineTo(child.point.x, child.point.y);
-}
 
 function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void, drawText: () => void, edgeType: EdgeConnectionType, hover: boolean): void {
   const time = performance.now();
@@ -67,9 +34,9 @@ function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void,
         ctx.strokeStyle = 'rgba(221,221,221, 0.5)';
         ctx.lineWidth = 2;
         if (edgeType & EdgeConnectionType.curved)
-          connectWithCurvedLines(prevBeforeAdd, prev, ctx);
+          connectNodesWithCurvedLine(prevBeforeAdd, prev, ctx, 0, 8);
         else
-          connectWithStraightLines(prevBeforeAdd, prev, ctx);
+          connectNodesWithStraightLine(prevBeforeAdd, prev, ctx);
         ctx.stroke();
         ctx.beginPath();
       }
@@ -93,9 +60,9 @@ function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void,
       ctx.fillStyle = '#555';
       ctx.lineWidth = 2;
       if (edgeType & EdgeConnectionType.curved)
-        connectWithCurvedLines(prevBeforeAdd, prev, ctx);
+        connectNodesWithCurvedLine(prevBeforeAdd, prev, ctx, 0, 8);
       else
-        connectWithStraightLines(prevBeforeAdd, prev, ctx);
+        connectNodesWithStraightLine(prevBeforeAdd, prev, ctx);
       ctx.stroke();
       ctx.beginPath();
     }
@@ -109,9 +76,9 @@ function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void,
       child.value.color = parent.value.rgbaColor ?? parent.value.color;
       child.value.fontColor = parent.value.fontColor;
       if (edgeType & EdgeConnectionType.curved)
-        connectWithCurvedLines(parent.value, child.value, ctx);
+        connectNodesWithCurvedLine(parent.value, child.value, ctx, 0, 8);
       else
-        connectWithStraightLines(parent.value, child.value, ctx);
+        connectNodesWithStraightLine(parent.value, child.value, ctx);
 
 
       if (!parent.value.rgbaColor) {
@@ -135,27 +102,38 @@ function connectAndRender(ctx: CanvasRenderingContext2D, drawCanvas: () => void,
   drawCanvas();
   drawText();
   const end = performance.now();
-  console.log(end - time);
 }
+
 const level2Objs = new RenderedObjects();
-const level3Objs = new RenderedObjects();
-const level4Objs = new RenderedObjects();
+
 export const SphereHandler = () => {
   const ctx = useCanvasCtx();
   const renderedText = new RenderedObjects();
+  const scale = useContext(ScaleContext)
+  console.log(scale)
   // this is bad, will need to create a RenderedObjects structure that is in tree format so we can BFS
-
 
   const [drawRoot] = useRenderedObjectsDraw(renderedObjectsIntance);
   const [drawLvl2] = useRenderedObjectsDraw(level2Objs);
   const [drawText] = useRenderedObjectsDraw(renderedText);
   const [hoveringNode, setHoveringNode] = useState<ShapesBase>({} as ShapesBase);
   const [nodeCount, setNodeCount] = useState(10);
-  const [connectionType, setConnectionType] = useState<EdgeConnectionType>(EdgeConnectionType.curved)
+  const [connectionType, setConnectionType] = useState<EdgeConnectionType>(EdgeConnectionType.curved);
+
+  const handleRedraw = () => {
+    if (!ctx) return;
+    connectAndRender(ctx, drawCanvas, drawText, connectionType, false);
+  }
+
+  useEventSubscriber({
+    onRedraw: handleRedraw
+  }, [ctx])
+
   const drawCanvas = () => {
     drawRoot();
     drawLvl2();
   }
+
   useEffect(() => {
     if (!ctx) return;
     if (isType<Node2D>(hoveringNode, 'radius', 'point')) {
@@ -164,6 +142,24 @@ export const SphereHandler = () => {
       connectAndRender(ctx, drawCanvas, drawText, connectionType, false);
     }
   }, [hoveringNode, ctx]);
+
+  useEffect(() => {
+    console.log('scale', scale)
+    if (scale === 1) return
+    for (let node of renderedObjectsIntance) {
+      if (isType(node.value, 'setScale')) {
+        node.value.setScale(scale)
+      }
+    }
+    for (let node of level2Objs) {
+      if (isType(node.value, 'setScale')) {
+        node.value.setScale(scale)
+      }
+    }
+    console.log('redrawing after scale change')
+    handleRedraw()
+  }, [scale])
+
   const handleClick = (e: React.MouseEvent) => {
     if (ctx == null) return;
     ctx.lineCap = 'round';
@@ -186,18 +182,16 @@ export const SphereHandler = () => {
     const level1NodeRadius = 86;
     const level2NodeRadius = 70;
 
-    const sAngle = Math.floor(Math.random() * 365)
-    const [positionNode, level1Radius, l1NodeRadius] = nodeArcAutoPosition({ center: sphere.point, centerRadius: sphere.radius, nodesCount: nodeCount, nodesRadius: level1NodeRadius, startAngle: sAngle, section: NodeSection.full });
+    const sAngle = Math.floor(Math.random() * 365);
+    const [positionNode, level1Radius, l1NodeRadius] = nodeRadialPosition({ center: sphere.point, centerRadius: sphere.radius, nodesCount: nodeCount, nodesRadius: level1NodeRadius, startAngle: sAngle, section: NodeSection.full });
+    const [position2Node, level2Radius] = nodeRadialPosition({ center: sphere.point, centerRadius: l1NodeRadius, nodesCount: nodeCount * 2, nodesRadius: level2NodeRadius, startAngle: sAngle, section: NodeSection.full });
 
-
-    const [position2Node, level2Radius] = nodeArcAutoPosition({ center: sphere.point, centerRadius: l1NodeRadius, nodesCount: nodeCount * 2, nodesRadius: level2NodeRadius, startAngle: sAngle, section: NodeSection.full });
     //visualise node
     renderedObjectsIntance.push(sphere);
     for (let index = 0; index < nodeCount; index++) {
       const { x, y } = positionNode(index);
       const sphere = new Node2D({ radius: level1NodeRadius, point: { x, y }, color: '#ccc', text: `${index + 1}`, fontColor: '#333943', strokeColor: '#FFF', progress: Math.floor(Math.random() * 101) });
       renderedObjectsIntance.push(sphere);
-
     }
 
     for (let lvl2Index = 0; lvl2Index < nodeCount * 2; lvl2Index++) {
@@ -205,21 +199,19 @@ export const SphereHandler = () => {
       const sphere = new Node2D({ radius: level2NodeRadius, point: { x, y }, color: '#ccc', text: `${lvl2Index + 1}`, fontColor: '#333943', strokeColor: '#FFF', progress: Math.floor(Math.random() * 101) });
       level2Objs.push(sphere);
     }
+
     connectAndRender(ctx, drawCanvas, drawText, connectionType, false);
 
+    ctx.restore();
+    ctx.beginPath();
 
-    // ctx.beginPath();
-    // ctx.fillStyle = 'rgba(150, 150, 150, .5)';
-    // ctx.arc(currentX, currentY, level1Radius, 0, Math.PI * 2);
-    // ctx.fill();
-    // ctx.stroke();
-    // ctx.beginPath();
-    // ctx.beginPath();
-    // ctx.fillStyle = 'rgba(100, 150, 100, .5)';
-    // ctx.arc(currentX, currentY, level2Radius, 0, Math.PI * 2);
-    // ctx.fill();
-    // ctx.stroke();
-    // ctx.beginPath();
+    const points = getNodeAttachentPoints(sphere.point, sphere.radius, 0, 8);
+
+    for (let p of points) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+      ctx.stroke();
+    }
   };
 
   const checkHover = (e: React.MouseEvent) => {
