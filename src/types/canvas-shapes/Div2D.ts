@@ -1,16 +1,15 @@
 import { RenderedObjects } from '@/store';
-import { hasMagicNumber } from '@/utils';
 import { type Need } from '@practicaljs/canvas-kit';
-import { ShapesBase, type Serializable } from '../ShapesBase';
+import { ShapesBase, type ICanvasComponent } from '../ShapesBase';
 import { MagicNumbers } from './ShapesService';
 
-export class Box2D extends ShapesBase implements Serializable {
+export class Div2D extends ShapesBase implements ICanvasComponent {
   width: number;
   height: number;
   radius: number;
   path: Path2D;
   boxes: RenderedObjects = new RenderedObjects();
-  constructor(props: Need<Box2D, 'width' | 'height' | 'point'>) {
+  constructor(props: Need<Div2D, 'width' | 'height' | 'point'>) {
     super(props);
 
     this.point = props.point;
@@ -27,13 +26,13 @@ export class Box2D extends ShapesBase implements Serializable {
   draw(ctx: CanvasRenderingContext2D) {
     ctx.restore();
     ctx.beginPath();
-    if (this.color !== '') {
-      ctx.fillStyle = this.color;
+    if (this.fillColor) {
+      ctx.fillStyle = this.fillColor + this.alpha;
       ctx.fill(this.path);
     }
 
-    if (this.strokeColor != null && this.strokeColor !== '') {
-      ctx.strokeStyle = this.strokeColor;
+    if (this.strokeColor) {
+      ctx.strokeStyle = this.strokeColor + this.alpha;
       ctx.stroke(this.path);
     }
   }
@@ -64,22 +63,5 @@ export class Box2D extends ShapesBase implements Serializable {
     magicPrefix.set(MagicNumbers.box);
     magicPrefix.set(bytes, MagicNumbers.box.length);
     return magicPrefix;
-  }
-
-  static fromByteArray(payload: Uint8Array) {
-    if (!Box2D.byteArrayIsTypeOf(payload)) return null;
-    const fullString = ShapesBase.decoder.decode(payload.slice(MagicNumbers.box.length));
-    const thisJson = JSON.parse(fullString) as Box2D;
-    const { boxes, ...mainJson } = thisJson;
-    const parent = new Box2D(mainJson);
-    for (const box of boxes) {
-      const child = new Box2D(box as any);
-      parent.boxes.push(child);
-    }
-    return parent;
-  };
-
-  static byteArrayIsTypeOf(payload: Uint8Array) {
-    return hasMagicNumber(payload, MagicNumbers.box);
   }
 }

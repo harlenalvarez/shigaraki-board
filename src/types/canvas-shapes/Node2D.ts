@@ -1,23 +1,15 @@
-import { hasMagicNumber } from '@/utils';
-import { fromAlpaToHex, type Need, translateAngle, type Point } from '@practicaljs/canvas-kit';
-import { ShapesBase, type Serializable } from '../ShapesBase';
+import { fromStringToMap, getContrast, serializeMapToString } from '@/utils';
+import { FontStyle, getDistance, getNodeAttachentPoints, type Need } from '@practicaljs/canvas-kit';
+import { ShapesBase, type ICanvasComponent } from '../ShapesBase';
 import { MagicNumbers } from './ShapesService';
 import { Text2D } from './Text2D';
 
-export class Node2D extends ShapesBase implements Serializable {
+export class Node2D extends ShapesBase implements ICanvasComponent {
   radius: number;
   path: Path2D;
-  text?: string;
-  progress?: number;
-  private readonly progressPath?: Path2D;
-  private _text?: Text2D;
-  get fontColor(): string {
-    return this._text?.color ?? '';
-  }
-
-  set fontColor(value: string) {
-    if (this._text) { this._text.color = value; }
-  }
+  text: Map<string, FontStyle> = new Map();
+  textColor?: string;
+  textPath?: Text2D;
 
   constructor(props: Need<Node2D, 'radius' | 'point'>) {
     super(props);
@@ -26,29 +18,40 @@ export class Node2D extends ShapesBase implements Serializable {
 
     this.path = new Path2D();
     this.path.arc(this.point.x, this.point.y, this.radius, 0, 2 * Math.PI);
-
     if (props.text) {
-      this.text = props.text;
-      this._text = new Text2D({ value: props.text, point: this.point, alignment: 'center', baseline: 'middle' });
-    }
-    this.fontColor = props.fontColor ?? '';
-    if (props.progress) {
-      this.progress = props.progress;
-      this.progressPath = new Path2D();
-      const startAngle = translateAngle(0) * (Math.PI / 180);
-      const progressArch = ((props.progress * (Math.PI)) / 50) + startAngle;
-      this.progressPath.arc(this.point.x, this.point.y, this.radius + 4, startAngle, progressArch);
+      const text = typeof props.text === 'string' ? fromStringToMap<string, FontStyle>(props.text) : props.text;
+      if (text?.size) {
+        this.text = text;
+        this.textColor = props.textColor ?? getContrast(this.fillColor ?? '#FFFFFF')
+        const points = getNodeAttachentPoints(this.point, this.radius, 0, 8);
+        const maxWidth = Math.floor(getDistance(points[1], points[7]));
+        const maxHeight = Math.floor(getDistance(points[1], points[3]));
+        const maxSingleLine = this.radius * 2 - 4;
+        this.textPath = new Text2D({
+          value: text,
+          point: this.point,
+          alignment: 'center',
+          baseline: 'middle',
+          fillColor: this.textColor,
+          maxWidth,
+          maxHeight,
+          maxSingleLine
+        });
+      }
     }
     this.draw = this.draw.bind(this);
   }
 
-  toJson(): { point: Point, color: string, strokeColor: string | undefined } {
+  //TODO: handle text map and unit test
+  toJson() {
     const baseJson = super.toJson();
     const fullJson = {
       ...baseJson,
       ...{
         radius: this.radius,
-        point: this.point
+        point: this.point,
+        text: serializeMapToString(this.text),
+        textColor: this.textColor
       }
     };
     return fullJson;
@@ -63,65 +66,25 @@ export class Node2D extends ShapesBase implements Serializable {
     return magicPrefix;
   }
 
-  static fromByteArray(payload: Uint8Array) {
-    if (!Node2D.byteArrayIsTypeOf(payload)) return null;
-    const fullString = ShapesBase.decoder.decode(payload.slice(MagicNumbers.box.length));
-    const thisJson = JSON.parse(fullString) as Node2D;
-    const parent = new Node2D(thisJson);
-    return parent;
-  };
-
-  static byteArrayIsTypeOf(payload: Uint8Array) {
-    return hasMagicNumber(payload, MagicNumbers.sphere);
-  }
-
   draw(ctx: CanvasRenderingContext2D) {
     ctx.restore();
     ctx.beginPath();
 
-    if (this.color !== '') {
-      ctx.fillStyle = this.color;
+    if (this.fillColor) {
+      ctx.fillStyle = this.fillColor + this.alpha;
       ctx.fill(this.path);
     }
 
-    if (this.strokeColor != null && this.strokeColor !== '') {
+    if (this.strokeColor) {
       ctx.strokeStyle = this.strokeColor;
-      if (this.rgbaColor && this.rgbaColor[3] < 1) {
-        ctx.strokeStyle += fromAlpaToHex(this.rgbaColor[3]);
-      }
+      ctx.strokeStyle = this.strokeColor + this.alpha
       ctx.lineWidth = 4;
       ctx.stroke(this.path);
     }
 
-    if (this._text) {
-      this._text.draw(ctx);
+    if (this.textPath) {
+      this.textPath.draw(ctx);
     }
-    if (this.progressPath && this.progress) {
-      ctx.restore();
-      ctx.beginPath();
-      const colors = {
-        above: '#1D8734',
-        onplan: '#77B10B',
-        medium: '#FB810F',
-        risk: '#D93630'
-      };
-      ctx.strokeStyle = this.progress < 26 ? colors.risk : this.progress < 51 ? colors.medium : this.progress < 76 ? colors.onplan : colors.above;
-      if (this.rgbaColor && this.rgbaColor[3] < 1) {
-        ctx.strokeStyle += fromAlpaToHex(this.rgbaColor[3]);
-      }
-      ctx.stroke(this.progressPath);
-    }
-  }
-
-  setScale(scale: number) {
-    this.scale = scale;
-    if (this.text) {
-      this._text = new Text2D({ value: this.text, point: this.point, alignment: 'center', baseline: 'middle', scale });
-    }
-
-    this.path = new Path2D();
-    this.path.arc(this.point.x, this.point.y, this.radius * scale, 0, 2 * Math.PI);
   }
 }
 
-// 100/2PI = P/x = (100x) = (P*2PI)/100 = x

@@ -16,7 +16,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/material": "^5.11.2",
-    "@practicaljs/canvas-kit": "0.3.1",
+    "@practicaljs/canvas-kit": "0.4.2",
     "@practicaljs/react-eventchannel": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

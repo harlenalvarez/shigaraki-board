@@ -1,4 +1,4 @@
 export type CanvasComponent = {
-  componentId: string
+  id: string
   position: { x: number, y: number }
 };

@@ -1,9 +1,8 @@
-import { Box2D, isType, type Serializable, type ShapesBase, ShapeTypes, Text2D } from '@/types';
-import { findShape } from '@/utils';
+import { isType, type ICanvasComponent } from '@/types';
+import { generateShapeFromByteArray } from '@/types/canvas-shapes/ShapesFactory';
 
-let subscribers: Array<() => void> = [];
+let subscribers: Set<() => void> = new Set();
 const notify = () => {
-  console.log('Changes ', subscribers.length);
   subscribers.forEach(s => { s(); });
 };
 
@@ -19,14 +18,14 @@ class RenderedObject<T> {
 }
 
 export class RenderedObjects {
-  head: RenderedObject<ShapesBase> | null;
-  tail: RenderedObject<ShapesBase> | null;
+  head: RenderedObject<ICanvasComponent> | null;
+  tail: RenderedObject<ICanvasComponent> | null;
   private _length: number;
   get length() {
     return this._length;
   }
 
-  constructor(latest?: RenderedObject<ShapesBase>) {
+  constructor(latest?: RenderedObject<ICanvasComponent>) {
     this.head = latest ?? null;
     this.tail = null;
     if (this.head != null) {
@@ -37,7 +36,7 @@ export class RenderedObjects {
     this.getSnapshot = this.getSnapshot.bind(this);
   }
 
-  push(value: ShapesBase) {
+  push(value: ICanvasComponent) {
     this._length++;
     const node = new RenderedObject(value);
     if (this.head == null) {
@@ -62,7 +61,7 @@ export class RenderedObjects {
     notify();
   }
 
-  remove(node: RenderedObject<ShapesBase> | null) {
+  remove(node: RenderedObject<ICanvasComponent> | null) {
     if (node == null) return null;
     this._length--;
 
@@ -91,7 +90,7 @@ export class RenderedObjects {
     return this.remove(this.head);
   }
 
-  * [Symbol.iterator]() {
+  *[Symbol.iterator]() {
     let curr = this.head;
     while (curr != null) {
       yield curr;
@@ -114,7 +113,7 @@ export class RenderedObjects {
   * toByteArray() {
     for (const node of this) {
       if (node.value === null) continue;
-      if (isType<Serializable>(node.value, 'toByteArray')) {
+      if (isType<ICanvasComponent>(node.value, 'toByteArray')) {
         yield node.value.toByteArray();
       }
     }
@@ -130,37 +129,26 @@ export class RenderedObjects {
 
   fromUint8ByteArray(nodes: Uint8Array[]) {
     for (const node of nodes) {
-      const type = findShape(node.subarray(0, 5));
-      this.parseAndPush(node, type);
+      this.parseAndPush(node);
     }
   }
 
-  parseAndPush(node: Uint8Array, nodeType: number) {
-    if (nodeType & ShapeTypes.box) {
-      const textNode = Box2D.fromByteArray(node);
-      if (textNode === null) throw new Error('Failed to parse');
-      this.push(textNode);
-    } else {
-      const boxNode = Text2D.fromByteArray(node);
-      if (boxNode === null) throw new Error('Failed to parse box node');
-      this.push(boxNode);
-    }
+  parseAndPush(node: Uint8Array) {
+    const shape = generateShapeFromByteArray(node)
+    if (!shape) return;
+    this.push(shape)
   }
 
   // react specific
   subscribe = (onStoreChange: () => void) => {
-    subscribers = [...subscribers, onStoreChange];
-    console.log('Added subscriber');
+    subscribers.add(onStoreChange);
     return () => {
-      console.log('About to Remove sub', subscribers.length);
-      subscribers = subscribers.filter(s => s !== onStoreChange);
-      console.log('Removed sub', subscribers.length);
+      subscribers.delete(onStoreChange);
     };
   };
 
   getSnapshot() {
-    console.log('GEtting length');
-    return this.length;
+    return 'ignore';
   }
 }
 

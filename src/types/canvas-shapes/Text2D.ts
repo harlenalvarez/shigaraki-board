@@ -1,25 +1,35 @@
-import { styleColors } from '@/store';
-import { hasMagicNumber } from '@/utils';
-import { type Need } from '@practicaljs/canvas-kit';
-import { ShapesBase, type Serializable } from '../ShapesBase';
+import { fromStringToMap, serializeMapToString } from '@/utils/serializeHelpers';
+import { fillTextContained, FontStyle, parseFont, TextAlignment, TextBaseline, type Need } from '@practicaljs/canvas-kit';
+import { ShapesBase, type ICanvasComponent } from '../ShapesBase';
 import { MagicNumbers } from './ShapesService';
 
-export class Text2D extends ShapesBase implements Serializable {
-  value: string;
-  font: string;
-  alignment: 'start' | 'end' | 'left' | 'center' | 'right';
-  baseline: 'top' | 'hanging' | 'middle' | 'alphabetic' | 'ideographic' | 'bottom';
+export class Text2D extends ShapesBase implements ICanvasComponent {
+  value: Map<string, FontStyle> = new Map();
+  alignment: TextAlignment;
+  baseline: TextBaseline;
+
+  maxHeight?: number;
+  maxWidth?: number;
+  maxSingleLine?: number
+  private containedLines?: Map<string, FontStyle>;
 
   constructor(props: Need<Text2D, 'value' | 'point'>) {
     super(props);
-    this.value = props.value;
+    if (typeof props.value === 'string') {
+      const formatValue = fromStringToMap<string, FontStyle>(props.value);
+      if (!formatValue)
+        throw new Error('Invalid value format');
+      this.value = formatValue
+    }
+    else {
+      this.value = props.value;
+    }
     this.point = props.point;
-    this.font = props.font ?? '20px Verdana';
     this.alignment = props.alignment ?? 'start';
     this.baseline = props.baseline ?? 'alphabetic';
-
-    this.color = props.color ?? styleColors.textDark;
-    this.strokeColor = props.strokeColor;
+    this.maxHeight = props.maxHeight;
+    this.maxWidth = props.maxWidth;
+    this.maxSingleLine = props.maxSingleLine;
     this.draw = this.draw.bind(this);
   }
 
@@ -27,19 +37,42 @@ export class Text2D extends ShapesBase implements Serializable {
     ctx.restore();
     ctx.beginPath();
 
-    ctx.font = this.font;
     ctx.textAlign = this.alignment;
     ctx.textBaseline = this.baseline;
-    ctx.fillStyle = this.color;
 
-    if (this.color) {
-      ctx.fillStyle = this.color;
-      ctx.fillText(this.value, this.point.x, this.point.y);
+    if (this.fillColor) {
+      ctx.fillStyle = this.fillColor + this.alpha;
+    }
+
+    if (this.strokeWidth) {
+      ctx.lineWidth = this.strokeWidth;
     }
 
     if (this.strokeColor) {
-      ctx.strokeStyle = this.strokeColor;
-      ctx.strokeText(this.value, this.point.x, this.point.y);
+      ctx.strokeStyle = this.strokeColor + this.alpha;
+    }
+
+    if (this.maxHeight && this.maxWidth) {
+      this.containedLines = fillTextContained(
+        this.value,
+        ctx,
+        { maxWidth: this.maxWidth, maxHeight: this.maxHeight, maxSingleLine: this.maxSingleLine, margin: 2, zoom: 1 },
+        this.point,
+        this.containedLines
+      );
+    }
+    else {
+      // this must be single text style line so we just render the line and use the overall font
+      if (this.fillColor) {
+        for (let line of this.value.entries()) {
+          ctx.font = parseFont(line[1]);
+          ctx.fillText(line[0], this.point.x, this.point.y)
+        }
+      }
+
+      if (this.strokeColor) {
+
+      }
     }
   }
 
@@ -48,10 +81,12 @@ export class Text2D extends ShapesBase implements Serializable {
     const textJson = {
       ...baseJson,
       ...{
-        value: this.value,
-        font: this.font,
+        value: serializeMapToString(this.value),
         alignment: this.alignment,
-        baseline: this.baseline
+        baseline: this.baseline,
+        maxHeight: this.maxHeight,
+        maxWidth: this.maxWidth,
+        maxSingleLine: this.maxSingleLine
       }
     };
     const string = JSON.stringify(textJson);
@@ -62,16 +97,4 @@ export class Text2D extends ShapesBase implements Serializable {
     return magicPrefix;
   }
 
-  static fromByteArray(payload: Uint8Array) {
-    if (!Text2D.byteArrayIsTypeOf(payload)) return null;
-    const decodedPayload = ShapesBase.decoder.decode(payload.subarray(MagicNumbers.text.length));
-    const textJson = JSON.parse(decodedPayload) as Text2D;
-    return new Text2D(textJson);
-  }
-
-  static byteArrayIsTypeOf(payload: Uint8Array) {
-    return hasMagicNumber(payload, MagicNumbers.text);
-  }
-
-  setScale(scale: number) { }
 }

@@ -1,10 +1,17 @@
 import { Text2D } from '@/types';
+import { generateShapeFromByteArray } from '@/types/canvas-shapes/ShapesFactory';
+import { FontStyle } from '@practicaljs/canvas-kit';
 import { afterEach, describe, expect, test } from 'vitest';
 import { renderedObjects } from './CanvasRenderedObjects';
 
-const firstobjectadded = new Text2D({ value: 'test', point: { x: 0, y: 0 } });
-const secondObj = new Text2D({ value: 'second', point: { x: 0, y: 0 } });
-const third = new Text2D({ value: 'third', point: { x: 0, y: 0 } });
+const mockStyle: FontStyle = {
+  fontFamily: 'test family',
+  fontSize: 1,
+  fontWeight: 100
+};
+const firstobjectadded = new Text2D({ value: new Map([['test', mockStyle]]), point: { x: 0, y: 0 } });
+const secondObj = new Text2D({ value: new Map([['second', mockStyle]]), point: { x: 0, y: 0 } });
+const third = new Text2D({ value: new Map([['third', mockStyle]]), point: { x: 0, y: 0 } });
 
 describe('Render object structure', () => {
   afterEach(() => {
@@ -13,18 +20,24 @@ describe('Render object structure', () => {
 
   test('Should act as a queue keeping pointer to head and tail', () => {
     renderedObjects.push(firstobjectadded);
-    expect(renderedObjects.head?.value).toMatchObject({ value: 'test' });
+    let headText = renderedObjects.head?.value as Text2D;
+    expect(Object.fromEntries(headText.value)).toMatchObject({ 'test': mockStyle });
     expect(renderedObjects.tail).toBeNull();
     renderedObjects.push(secondObj);
-    expect(renderedObjects.head?.value).toMatchObject({ value: 'test' });
-    expect(renderedObjects.head?.next?.value).toMatchObject({ value: 'second' });
-
-    expect(renderedObjects.tail?.value).toMatchObject({ value: 'second' });
-    expect(renderedObjects.tail?.prev?.value).toMatchObject({ value: 'test' });
+    headText = renderedObjects.head?.value as Text2D;
+    expect(Object.fromEntries(headText.value)).toMatchObject({ 'test': mockStyle });
+    const secondText = renderedObjects.head?.next?.value as Text2D;
+    expect(Object.fromEntries(secondText.value)).toMatchObject({ 'second': mockStyle });
+    let tailText = renderedObjects.tail?.value as Text2D;
+    expect(Object.fromEntries(tailText.value)).toMatchObject({ 'second': mockStyle });
+    let prevFromTailText = renderedObjects.tail?.prev?.value as Text2D;
+    expect(Object.fromEntries(prevFromTailText.value)).toMatchObject({ 'test': mockStyle });
 
     renderedObjects.push(third);
-    expect(renderedObjects.tail?.value).toMatchObject({ value: 'third' });
-    expect(renderedObjects.tail?.prev?.value).toMatchObject({ value: 'second' });
+    tailText = renderedObjects.tail?.value as Text2D;
+    expect(Object.fromEntries(tailText.value)).toMatchObject({ 'third': mockStyle });
+    prevFromTailText = renderedObjects.tail?.prev?.value as Text2D;
+    expect(Object.fromEntries(prevFromTailText.value)).toMatchObject({ 'second': mockStyle });
   });
 
   test('Should pop from list (last element)', () => {
@@ -36,20 +49,25 @@ describe('Render object structure', () => {
     // pop first (2 remaining)
     const popped = renderedObjects.pop();
     expect(renderedObjects.length).toBe(2);
-    expect(popped?.value).toMatchObject({ value: 'third' });
-    expect(renderedObjects.head?.value).toMatchObject({ value: 'test' });
-    expect(renderedObjects.tail?.value).toMatchObject({ value: 'second' });
+    const poppedNode = popped?.value as Text2D;
+    expect(Object.fromEntries(poppedNode.value)).toMatchObject({ 'third': mockStyle });
+    const headText = renderedObjects.head?.value as Text2D;
+    expect(Object.fromEntries(headText.value)).toMatchObject({ 'test': mockStyle });
+    const tailText = renderedObjects.tail?.value as Text2D;
+    expect(Object.fromEntries(tailText.value)).toMatchObject({ 'second': mockStyle });
     expect(renderedObjects.head?.next).toBe(renderedObjects.tail);
 
     // pop second (1 reminaing)
     const poppedSecond = renderedObjects.pop();
     expect(renderedObjects.length).toBe(1);
-    expect(poppedSecond?.value).toMatchObject({ value: 'second' });
+    const secondText = poppedSecond?.value as Text2D;
+    expect(Object.fromEntries(secondText.value)).toMatchObject({ 'second': mockStyle });
 
     // pop last (0 reminaing)
     const poppedFirst = renderedObjects.pop();
     expect(renderedObjects.length).toBe(0);
-    expect(poppedFirst?.value).toMatchObject({ value: 'test' });
+    const poppedFirstText = poppedFirst?.value as Text2D;
+    expect(Object.fromEntries(poppedFirstText.value)).toMatchObject({ 'test': mockStyle });
     expect(renderedObjects.head).toBe(null);
 
     // try to pop when no more are left
@@ -66,17 +84,20 @@ describe('Render object structure', () => {
     // dequeue first element (2 remaining)
     const dequeue = renderedObjects.dequeue();
     expect(renderedObjects.length).toBe(2);
-    expect(dequeue?.value).toMatchObject({ value: 'test' });
+    const first = dequeue?.value as Text2D;
+    expect(Object.fromEntries(first.value)).toMatchObject({ 'test': mockStyle });
 
     // dequeue second (1 remaining)
     const second = renderedObjects.dequeue();
     expect(renderedObjects.length).toBe(1);
-    expect(second?.value).toMatchObject({ value: 'second' });
+    const secondNode = second?.value as Text2D;
+    expect(Object.fromEntries(secondNode.value)).toMatchObject({ 'second': mockStyle });
 
     // dequeue last (0 remininag)
     const last = renderedObjects.dequeue();
     expect(renderedObjects.length).toBe(0);
-    expect(last?.value).toMatchObject({ value: 'third' });
+    const lastNode = last?.value as Text2D;
+    expect(Object.fromEntries(lastNode.value)).toMatchObject({ 'third': mockStyle });
 
     // dequeue null
     const nullValue = renderedObjects.dequeue();
@@ -103,8 +124,19 @@ describe('Render object structure', () => {
     renderedObjects.push(third);
     let index = 0;
     for (const node of renderedObjects) {
-      if (index === 0) { expect(node.value).toMatchObject({ value: 'test' }); } else if (index === 1) { expect(node.value).toMatchObject({ value: 'second' }); } else if (index === 2) { expect(node.value).toMatchObject({ value: 'third' }); } else { expect(true).toBe(false); }
-
+      if (index === 0) {
+        const firstObj = node.value as Text2D
+        expect(firstObj.value.keys().next().value).toMatchObject('test');
+      }
+      else if (index === 1) {
+        const secObj = node.value as Text2D
+        expect(secObj.value.keys().next().value).toMatchObject('second');
+      }
+      else if (index === 2) {
+        const thirdObj = node.value as Text2D
+        expect(thirdObj.value.keys().next().value).toMatchObject('third');
+      }
+      else { expect(true).toBe(false); }
       index++;
     }
   });
@@ -118,7 +150,7 @@ describe('Render object structure', () => {
     const { value: firstArray } = iterator.next();
     expect(firstArray).not.toBeNull();
     if (firstArray == null) return;
-    const firstObj = Text2D.fromByteArray(firstArray);
+    const firstObj = generateShapeFromByteArray(firstArray) as Text2D;
     expect(firstObj).not.toBeNull();
     if (firstObj == null) return;
     expect(firstObj.value).toEqual(firstobjectadded.value);
@@ -132,6 +164,7 @@ describe('Render object structure', () => {
     renderedObjects.clear();
     renderedObjects.fromByteArray(arrayObjects);
     expect(renderedObjects.length).toBe(3);
-    expect(renderedObjects.head?.value).toMatchObject({ value: 'test' });
+    const firstObj = renderedObjects.head?.value as Text2D
+    expect(firstObj.value.keys().next().value).toMatchObject('test');
   });
 });

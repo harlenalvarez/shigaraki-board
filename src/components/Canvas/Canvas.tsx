@@ -1,4 +1,5 @@
 import { useSetCanvasCtx } from '@/store';
+import { canvasTransform } from '@/store/Canvas2dContextNonReact';
 import { useEventProducer } from '@practicaljs/react-eventchannel';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 
@@ -7,28 +8,30 @@ export const Canvas = () => {
   const setCtx = useSetCanvasCtx();
   const [redraw] = useEventProducer({ eventName: 'onRedraw' });
 
-  useLayoutEffect(() => {
-    handleSetCurrentHeight();
-    // handleStyledSize();
-  }, []);
-
-  const handleSetCurrentHeight = useCallback((e?: { clientX: number, clientY: number }) => {
+  const createCanvas = useCallback(() => {
     if (!canvasRef.current) return;
     const ctx = canvasRef.current.getContext('2d');
     if (!ctx) return;
 
-    const ratio = Math.ceil(window.devicePixelRatio);
-    const height = Math.max(window.innerHeight, 1600);
-    const width = Math.max(window.innerWidth, 1600);
-    canvasRef.current.height = height * ratio;
-    canvasRef.current.width = width * ratio;
+    const height = window.innerHeight;
+    const width = window.innerWidth;
+    canvasRef.current.height = height * window.devicePixelRatio;
+    canvasRef.current.width = width * window.devicePixelRatio;
     canvasRef.current.style.width = `${width}px`;
     canvasRef.current.style.height = `${height}px`;
 
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
+    ctx.setTransform(canvasTransform.scale, 0, 0, canvasTransform.scale, canvasTransform.offset.x, canvasTransform.offset.y);
+    ctx.save();
     setCtx(ctx);
     redraw();
+  }, []);
+
+  useLayoutEffect(() => {
+    createCanvas();
+    document.addEventListener('resize', createCanvas)
+    return () => {
+      document.addEventListener('resize', createCanvas)
+    }
   }, []);
 
   return (
